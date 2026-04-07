@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh mục sản phẩm - SneakerStore</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: #ffd700;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-menu a:hover {
+            color: #ffd700;
+        }
+
+        .search-cart {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            padding: 0 0.5rem;
+            width: 200px;
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .search-box button {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+
+        .auth-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .login-link, .register-link {
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .login-link {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .register-link {
+            background: #ffd700;
+            color: #333;
+        }
+
+        .login-link:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .register-link:hover {
+            background: #ffed4a;
+            transform: translateY(-2px);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ffd700;
+            color: #333;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.3rem 1rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 25px;
+        }
+
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 220px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            display: none;
+            margin-top: 10px;
+            z-index: 1000;
+        }
+
+        .user-dropdown-menu.show {
+            display: block;
+        }
+
+        .user-dropdown-menu a {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1rem;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .user-dropdown-menu a:hover {
+            background: #f5f5f5;
+        }
+
+        .user-dropdown-menu a i {
+            width: 20px;
+            color: #764ba2;
+        }
+
+        .user-dropdown-menu .logout-btn {
+            color: #dc3545;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #eee;
+            margin: 0.5rem 0;
+        }
+
+        .main-content {
+            margin-top: 100px;
+            min-height: calc(100vh - 200px);
+            padding: 2rem 0 4rem;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #333;
+            position: relative;
+            font-weight: bold;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: #764ba2;
+        }
+
+        .categories-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            padding: 1rem 0;
+        }
+
+        .category-item {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .category-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 35px rgba(0,0,0,0.15);
+        }
+
+        .category-image {
+            height: 220px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .category-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .category-item:hover .category-image img {
+            transform: scale(1.08);
+        }
+
+        .category-content {
+            padding: 1.8rem 1.5rem;
+        }
+
+        .category-icon {
+            font-size: 2.5rem;
+            color: #764ba2;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .category-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.8rem;
+        }
+
+        .category-description {
+            color: #666;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+
+        .category-btn {
+            display: inline-block;
+            padding: 0.7rem 1.8rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 40px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .category-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(118, 75, 162, 0.3);
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 35px rgba(0,0,0,0.1);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #ffd700;
+            color: #333;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            z-index: 2;
+        }
+
+        .product-image {
+            height: 260px;
+            overflow: hidden;
+            position: relative;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .product-actions {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover .product-actions {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .action-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: all 0.2s;
+            color: #764ba2;
+            font-size: 1rem;
+        }
+
+        .action-btn:hover {
+            background: #764ba2;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-category {
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .product-name {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+            line-height: 1.4;
+            height: 3rem;
+            overflow: hidden;
+        }
+
+        .product-rating {
+            color: #ffc107;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .product-price {
+            display: flex;
+            align-items: baseline;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .current-price {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #764ba2;
+        }
+
+        .old-price {
+            color: #aaa;
+            text-decoration: line-through;
+            font-size: 0.9rem;
+        }
+
+        .sold-count {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 0.5rem;
+        }
+
+        .back-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .back-header h2 {
+            font-size: 2rem;
+            color: #333;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .back-header h2 i {
+            color: #764ba2;
+        }
+
+        .back-btn {
+            padding: 0.7rem 1.5rem;
+            background: #f0f0f0;
+            color: #333;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn:hover {
+            background: #e0e0e0;
+            transform: translateX(-3px);
+        }
+
+        footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 4rem 0 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h3 {
+            color: #ffd700;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-section p {
+            color: #ccc;
+            line-height: 1.8;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-section ul li a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section ul li a:hover {
+            color: #ffd700;
+        }
+
+        .footer-section ul li i {
+            width: 20px;
+            margin-right: 10px;
+            color: #ffd700;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            background: #ffd700;
+            color: #333;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #ccc;
+        }
+
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            font-weight: 500;
+            min-width: 300px;
+        }
+
+        .notification.error {
+            background: #dc3545;
+        }
+
+        .notification.info {
+            background: #17a2b8;
+        }
+
+        .notification.warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .categories-container, .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.8rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 2rem;
+            }
+            .categories-container, .product-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            .category-image {
+                height: 200px;
+            }
+            .back-header h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">Sneaker<span>Store</span></a>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Trang chủ</a></li>
+                    <li><a href="categories.html" style="color: #ffd700;">Danh mục</a></li>
+                    <li><a href="index.html#products">Sản phẩm</a></li>
+                    <li><a href="khuyenmai.html">Khuyến mãi</a></li>
+                    <li><a href="lienhe.html">Liên hệ</a></li>
+                </ul>
+                <div class="search-cart" id="userMenu"></div>
+            </div>
+        </div>
+    </header>
+
+    <section class="main-content">
+        <div class="container" id="mainContainer"></div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>SneakerStore</h3>
+                    <p>Cửa hàng giày thể thao uy tín hàng đầu Việt Nam với đa dạng mẫu mã và chất lượng đảm bảo.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Liên kết nhanh</h3>
+                    <ul>
+                        <li><a href="index.html">Trang chủ</a></li>
+                        <li><a href="categories.html">Danh mục</a></li>
+                        <li><a href="index.html#products">Sản phẩm</a></li>
+                        <li><a href="khuyenmai.html">Khuyến mãi</a></li>
+                        <li><a href="lienhe.html">Liên hệ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Hỗ trợ khách hàng</h3>
+                    <ul>
+                        <li><a href="#">Hướng dẫn mua hàng</a></li>
+                        <li><a href="#">Chính sách đổi trả</a></li>
+                        <li><a href="#">Chính sách bảo mật</a></li>
+                        <li><a href="#">Câu hỏi thường gặp</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Thông tin liên hệ</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Đường ABC, Quận Hoàn Kiếm, Hà Nội</li>
+                        <li><i class="fas fa-phone"></i> 1900 1234</li>
+                        <li><i class="fas fa-envelope"></i> info@sneakerstore.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 SneakerStore. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== DANH SÁCH SẢN PHẨM ĐỒNG BỘ VỚI INDEX.HTML =====
+        const defaultProducts = [
+            { id: 'SP001', name: 'Nike Air Zoom Pegasus 40', category: 'running', brand: 'Nike', price: 1290000, oldPrice: 1490000, image: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=500', rating: 4.5, sold: 45, stock: 15, description: 'Giày chạy bộ công nghệ tiên tiến với đệm lót thoáng khí. Thiết kế nhẹ, bền, thoải mái cho những chuyến chạy dài.', sizes: [36, 37, 38, 39, 40, 41, 42, 43], colors: ['Đen', 'Xám', 'Xanh'], material: 'Mesh/Rubber', weight: '240g' },
+            { id: 'SP002', name: 'Adidas Supernova Ease', category: 'running', brand: 'Adidas', price: 1390000, oldPrice: 0, image: 'https://assets.adidas.com/images/h_840,f_auto,q_auto,fl_lossy,c_fill,g_auto/cbe301e2c23440afb067b76516315a47_9366/Supernova_Ease_Shoes_White_IF9563_01_00_standard.jpg', rating: 5, sold: 38, stock: 22, description: 'Công nghệ Boost mới nhất từ Adidas mang lại độ đàn hồi tuyệt vời. Hoàn hảo cho những vận động viên chạy bộ chuyên nghiệp.', sizes: [36, 37, 38, 39, 40, 41, 42, 43], colors: ['Trắng', 'Đen', 'Vàng'], material: 'Mesh/EVA Boost', weight: '245g' },
+            { id: 'SP003', name: 'Hoka Bondi 9', category: 'running', brand: 'Hoka', price: 1450000, oldPrice: 0, image: 'https://dms.deckers.com/hoka/image/upload/f_auto,q_40,dpr_2/b_rgb:f7f7f9/w_1110/v1732554715/1162011-BBLC_6.png?_s=RAABAB0', rating: 5, sold: 42, stock: 18, description: 'Hoka Bondi 9 với độ dày đệm lót cao nhất, mang lại sự thoải mái tối đa cho chạy bộ đường dài.', sizes: [36, 37, 38, 39, 40, 41, 42, 43], colors: ['Xanh', 'Đen', 'Cam'], material: 'Synthetic/Rubber', weight: '280g' },
+            { id: 'SP004', name: 'Nike Metcon 9', category: 'training', brand: 'Nike', price: 1350000, oldPrice: 0, image: 'https://www.nike.ae/dw/image/v2/BDVB_PRD/on/demandware.static/-/Sites-akeneo-master-catalog/default/dwb4695d32/nk/5f5/3/a/9/a/0/5f53a9a0_10aa_4da4_a448_ef36dc04cf71.jpg', rating: 4.5, sold: 35, stock: 20, description: 'Giày tập luyện đa năng với đế bằng phẳng cứng chắc. Lý tưởng cho CrossFit, weight training và các hoạt động HIIT.', sizes: [36, 37, 38, 39, 40, 41, 42, 43], colors: ['Đen', 'Trắng', 'Xam'], material: 'Leather/Rubber', weight: '320g' },
+            { id: 'SP005', name: 'Reebok Nano X3', category: 'training', brand: 'Reebok', price: 1250000, oldPrice: 1450000, image: 'https://tse2.mm.bing.net/th/id/OIP.b7lbqAzuTL9LJ30TTWCPYwHaFn?rs=1&pid=ImgDetMain&o=7&rm=3', rating: 5, sold: 32, stock: 25, description: 'Reebok Nano X3 được thiết kế đặc biệt cho các bài tập sức mạnh. Hỗ trợ tốt cho cơ chân và mũi chân.', sizes: [36, 37, 38, 39, 40, 41, 42, 43], colors: ['Đỏ', 'Đen', 'Xanh'], material: 'Synthetic/TPU', weight: '310g' },
+            { id: 'SP006', name: 'Under Armour TriBase Reign 4', category: 'training', brand: 'Under Armour', price: 1190000, oldPrice: 0, image: 'https://photo2.i-run.fr/under-armour-tribase-reign-4-m-chaussures-homme-532183-1-sz.jpg', rating: 4.5, sold: 28, stock: 16, description: 'Under Armour TriBase Reign 4 với công nghệ TriBase độc quyền. Cung cấp sự ổn định tuyệt vời cho tất cả các hoạt động tập luyện.', sizes: [36, 37, 38, 39, 40, 41, 42, 43], colors: ['Đen', 'Xám', 'Cam'], material: 'Mesh/Rubber', weight: '330g' },
+            { id: 'SP007', name: 'Nike LeBron XX', category: 'basketball', brand: 'Nike', price: 1490000, oldPrice: 0, image: 'https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/8c68dbb8-e288-43de-95ea-d7e887687597/LEBRON+XX+EP.png', rating: 5, sold: 40, stock: 14, description: 'Nike LeBron XX được hợp tác với LeBron James. Công nghệ MAX Air mới nhất mang lại hiệu suất tối cao.', sizes: [37, 38, 39, 40, 41, 42, 43, 44], colors: ['Vàng', 'Đen', 'Tím'], material: 'Leather/Rubber', weight: '380g' },
+            { id: 'SP008', name: 'Adidas Harden Vol. 7', category: 'basketball', brand: 'Adidas', price: 1420000, oldPrice: 0, image: 'https://tse1.mm.bing.net/th/id/OIP.nR7znjb9Fy_j90om8T6vzgHaFM?pid=ImgDet&w=474&h=332&rs=1&o=7&rm=3', rating: 4.5, sold: 36, stock: 19, description: 'Adidas Harden Vol. 7 được James Harden thiết kế. Mang lại cảm giác kiểm soát bóng tuyệt vời.', sizes: [37, 38, 39, 40, 41, 42, 43, 44], colors: ['Trắng', 'Đen', 'Đỏ'], material: 'Synthetic/Rubber', weight: '370g' },
+            { id: 'SP009', name: 'Puma MB.02 LaMelo Ball', category: 'basketball', brand: 'Puma', price: 1380000, oldPrice: 1580000, image: 'https://tse1.mm.bing.net/th/id/OIP.OqVn12Q25Ew89h45NelTkAHaE8?rs=1&pid=ImgDetMain&o=7&rm=3', rating: 5, sold: 44, stock: 21, description: 'Puma MB.02 được LaMelo Ball phát triển. Thiết kế hiện đại với công nghệ NITRO.', sizes: [37, 38, 39, 40, 41, 42, 43, 44], colors: ['Xanh', 'Hồng', 'Đen'], material: 'Mesh/Rubber', weight: '360g' },
+            { id: 'SP010', name: 'Nike Phantom GX Elite', category: 'football', brand: 'Nike', price: 1480000, oldPrice: 0, image: 'https://tse3.mm.bing.net/th/id/OIP.Q2NQSapOZvm3jo5cUggLxwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', rating: 5, sold: 30, stock: 12, description: 'Nike Phantom GX Elite dành cho những tiền đạo chuyên nghiệp. Thiết kế gọn nhẹ, độ cảm ứng bóng cao.', sizes: [37, 38, 39, 40, 41, 42, 43], colors: ['Đen', 'Trắng', 'Xanh lá'], material: 'Synthetic/TPU', weight: '210g' },
+            { id: 'SP011', name: 'Adidas Predator Accuracy.1', category: 'football', brand: 'Adidas', price: 1430000, oldPrice: 0, image: 'https://tse4.mm.bing.net/th/id/OIP.Nit-TYukLe_RHmVXom__vwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', rating: 5, sold: 33, stock: 17, description: 'Adidas Predator Accuracy.1 với công nghệ Controlskin. Lý tưởng cho những cầu thủ muốn kiểm soát bóng hoàn hảo.', sizes: [37, 38, 39, 40, 41, 42, 43], colors: ['Đỏ', 'Trắng', 'Đen'], material: 'Synthetic/Rubber', weight: '215g' },
+            { id: 'SP012', name: 'Puma Ultra Ultimate', category: 'football', brand: 'Puma', price: 1280000, oldPrice: 1480000, image: 'https://tse1.mm.bing.net/th/id/OIP.Kf9fAeDUAHicsPrXNOShbwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', rating: 4.5, sold: 29, stock: 23, description: 'Puma Ultra Ultimate với công nghệ InvisiWave. Tăng cường tốc độ và chính xác khi sút bóng.', sizes: [37, 38, 39, 40, 41, 42, 43], colors: ['Cam', 'Đen', 'Xanh'], material: 'Synthetic/TPU', weight: '220g' },
+            { id: 'SP013', name: 'NikeCourt Vapor Pro', category: 'tennis', brand: 'Nike', price: 1320000, oldPrice: 1520000, image: 'https://tse4.mm.bing.net/th/id/OIP.7LtRqw1Fs-etUlij5YxJYwAAAA?pid=ImgDet&w=400&h=400&rs=1&o=7&rm=3', rating: 5, sold: 41, stock: 24, description: 'NikeCourt Vapor Pro được thiết kế cho các tay vợt chuyên nghiệp. Độ bền cao, thoáng khí tốt.', sizes: [36, 37, 38, 39, 40, 41, 42], colors: ['Trắng', 'Xanh', 'Hồng'], material: 'Synthetic/Rubber', weight: '260g' },
+            { id: 'SP014', name: 'Adidas Ubersonic 4', category: 'tennis', brand: 'Adidas', price: 1370000, oldPrice: 0, image: 'https://assets.adidas.com/images/w_1880,f_auto,q_auto/998f76fc58f140b6a4caa22150037ac5_9366/IF9103_HM3_hover.jpg', rating: 4.5, sold: 37, stock: 20, description: 'Adidas Ubersonic 4 với công nghệ Boost. Cung cấp đệm lót và sự ổn định tuyệt vời cho tennis.', sizes: [36, 37, 38, 39, 40, 41, 42], colors: ['Đen', 'Trắng', 'Xanh'], material: 'Mesh/Rubber', weight: '275g' },
+            { id: 'SP015', name: 'Asics Gel-Resolution 9', category: 'tennis', brand: 'Asics', price: 1340000, oldPrice: 0, image: 'https://cdn.runrepeat.com/i/asics/39589/asics-gel-resolution-9-steel-blue-hazard-green-03d5-main.jpg', rating: 5, sold: 39, stock: 22, description: 'Asics Gel-Resolution 9 với công nghệ GEL. Hỗ trợ tốt cho các chuyển động nhanh trên sân tennis.', sizes: [36, 37, 38, 39, 40, 41, 42], colors: ['Xanh lá', 'Xám', 'Trắng'], material: 'Textile/Rubber', weight: '280g' },
+            { id: 'SP016', name: 'Yonex Aerus Z', category: 'badminton', brand: 'Yonex', price: 1250000, oldPrice: 1450000, image: 'https://tse4.mm.bing.net/th/id/OIP.hdXgtj13RY8-XjRLOWa_GAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', rating: 5, sold: 48, stock: 26, description: 'Yonex Aerus Z được thiết kế cho cầu thủ cầu lông chuyên nghiệp. Nhẹ, bền và thoáng khí.', sizes: [36, 37, 38, 39, 40, 41, 42], colors: ['Trắng', 'Đen', 'Vàng'], material: 'Synthetic/Rubber', weight: '250g' },
+            { id: 'SP017', name: 'Li-Ning Speed 9', category: 'badminton', brand: 'Li-Ning', price: 1180000, oldPrice: 0, image: 'https://wowsole.com/wp-content/uploads/2022/09/Li-Ning-Speed-9-Fred-VanVleet-Basketball-Shoes-Black-1200x1200.jpg', rating: 4.5, sold: 50, stock: 28, description: 'Li-Ning Speed 9 với công nghệ Speed Shell. Cho phép chuyển động nhanh và chính xác.', sizes: [36, 37, 38, 39, 40, 41, 42], colors: ['Đen', 'Đỏ', 'Xanh'], material: 'Mesh/Rubber', weight: '255g' },
+            { id: 'SP018', name: 'Victor A970 Ace', category: 'badminton', brand: 'Victor', price: 1280000, oldPrice: 0, image: 'https://badmintondirect.com/cdn/shop/files/SH970ACEC-5_900x.jpg?v=1686501226', rating: 5, sold: 42, stock: 19, description: 'Victor A970 Ace với đệm lót thoáng khí. Thiết kế ergonomic cho các cầu thủ cầu lông.', sizes: [36, 37, 38, 39, 40, 41, 42], colors: ['Xanh', 'Đen', 'Vàng'], material: 'Synthetic/TPU', weight: '260g' },
+            { id: 'SP019', name: 'Skechers Go Walk 6', category: 'walking', brand: 'Skechers', price: 1150000, oldPrice: 1350000, image: 'https://www.skechers.in/on/demandware.static/-/Sites-skechers_india/default/dwb14bb1e2/images/large/216275-1.jpg', rating: 5, sold: 55, stock: 30, description: 'Skechers Go Walk 6 được thiết kế cho những người thích đi bộ. Nhẹ, thoáng khí và thoải mái cả ngày.', sizes: [36, 37, 38, 39, 40, 41, 42, 43], colors: ['Đen', 'Trắng', 'Xanh'], material: 'Mesh/Memory Foam', weight: '220g' },
+            { id: 'SP020', name: 'New Balance Fresh Foam 1080', category: 'walking', brand: 'New Balance', price: 1390000, oldPrice: 0, image: 'https://www.runningshoesguru.com/wp-content/uploads/2022/09/New-Balance-Fresh-Foam-X-1080-v12-14.jpeg', rating: 4.5, sold: 47, stock: 18, description: 'New Balance Fresh Foam 1080 với công nghệ Fresh Foam. Thoáng khí tuyệt vời cho đi bộ hàng ngày.', sizes: [36, 37, 38, 39, 40, 41, 42, 43], colors: ['Xanh', 'Xám', 'Đỏ'], material: 'Mesh/EVA Foam', weight: '250g' },
+            { id: 'SP021', name: 'Hoka Clifton 9', category: 'walking', brand: 'Hoka', price: 1420000, oldPrice: 0, image: 'https://tse4.mm.bing.net/th/id/OIP.JTYj1VQm5VmcnZIYdGCeowHaGA?rs=1&pid=ImgDetMain&o=7&rm=3', rating: 5, sold: 43, stock: 16, description: 'Hoka Clifton 9 với độ dày đệm lót vừa phải. Lý tưởng cho những người yêu thích đi bộ đường dài.', sizes: [36, 37, 38, 39, 40, 41, 42, 43], colors: ['Đen', 'Xanh', 'Cam'], material: 'Synthetic/Rubber', weight: '275g' },
+            { id: 'SP022', name: 'Puma Velocity Nitro 2', category: 'running', brand: 'Puma', price: 1380000, oldPrice: 0, image: 'https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_2000,h_2000/global/378529/01/sv01/fnd/SEA/fmt/png/Velocity-NITRO-2-Run-75-Running-Shoes-Men', rating: 4.5, sold: 28, stock: 18, description: 'Giày chạy bộ hiệu suất cao với đệm Nitro. Thiết kế ôm chân và phản hồi nhanh.', sizes: [36, 37, 38, 39, 40, 41, 42, 43], colors: ['Xanh', 'Đen', 'Trắng'], material: 'Mesh/EVA', weight: '255g' },
+            { id: 'SP023', name: 'Nike Free Metcon 5', category: 'training', brand: 'Nike', price: 1320000, oldPrice: 0, image: 'https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/31a5bed1-b848-4b5e-a01f-364b250c862e/free-metcon-5-workout-shoes-7wNZNf.png', rating: 4.7, sold: 20, stock: 22, description: 'Giày tập luyện linh hoạt với đế vừa êm vừa ổn định cho các bài tập đa năng.', sizes: [36, 37, 38, 39, 40, 41, 42, 43], colors: ['Đen', 'Xám', 'Tím'], material: 'Mesh/Rubber', weight: '300g' },
+            { id: 'SP024', name: 'Jordan Ultra.Fly 3', category: 'basketball', brand: 'Jordan', price: 1440000, oldPrice: 0, image: 'https://tse3.mm.bing.net/th/id/OIP.ukKLSTUmKLXLfajxY0cPOAHaEL?rs=1&pid=ImgDetMain&o=7&rm=3', rating: 4.8, sold: 23, stock: 17, description: 'Giày bóng rổ nhẹ và thoáng khí, hỗ trợ bật nhảy và đệm chống va chạm.', sizes: [37, 38, 39, 40, 41, 42, 43, 44], colors: ['Đen', 'Trắng', 'Xanh'], material: 'Synthetic/Rubber', weight: '365g' },
+            { id: 'SP025', name: 'Adidas X Speedportal.1', category: 'football', brand: 'Adidas', price: 1460000, oldPrice: 0, image: 'https://tse3.mm.bing.net/th/id/OIP.svWbTvQX61U-afnBIYMq0wHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', rating: 4.6, sold: 26, stock: 14, description: 'Giày đá banh tốc độ với đinh TF trợ lực, phù hợp sân cỏ nhân tạo và cỏ tự nhiên.', sizes: [37, 38, 39, 40, 41, 42, 43], colors: ['Đen', 'Đỏ', 'Xanh'], material: 'Synthetic', weight: '230g' },
+            { id: 'SP026', name: 'Wilson Rush Pro 3.5', category: 'tennis', brand: 'Wilson', price: 1360000, oldPrice: 0, image: 'https://th.bing.com/th/id/R.69acbb2690dfcb4d27bfd6c4998a23bb?rik=4sW6KP6vQ%2bCxOA&pid=ImgRaw&r=0', rating: 4.7, sold: 29, stock: 21, description: 'Giày tennis ổn định, chống trượt cao, phù hợp các trận đánh nhanh và di chuyển cường độ cao.', sizes: [36, 37, 38, 39, 40, 41, 42], colors: ['Đen', 'Trắng', 'Xanh'], material: 'Synthetic/Rubber', weight: '270g' },
+            { id: 'SP027', name: 'Victor A950', category: 'badminton', brand: 'Victor', price: 1270000, oldPrice: 0, image: 'https://tse3.mm.bing.net/th/id/OIP.gN8G4n5oMKd_NKbTgfqWTwHaGp?rs=1&pid=ImgDetMain&o=7&rm=3', rating: 4.5, sold: 31, stock: 25, description: 'Giày cầu lông nổi tiếng về độ nhẹ và ổn định, phù hợp với các pha di chuyển nhanh.', sizes: [36, 37, 38, 39, 40, 41, 42], colors: ['Trắng', 'Đỏ', 'Xanh'], material: 'Synthetic/Rubber', weight: '240g' },
+            { id: 'SP028', name: 'Asics Gel-Nimbus 27', category: 'walking', brand: 'Asics', price: 1440000, oldPrice: 0, image: 'https://tse3.mm.bing.net/th/id/OIP.QWmK6_4K5BTOQWWHT1oNKQHaFj?rs=1&pid=ImgDetMain&o=7&rm=3', rating: 4.8, sold: 35, stock: 19, description: 'Giày đi bộ đệm êm, hỗ trợ tốt cho bước đi hàng ngày và du lịch.', sizes: [36, 37, 38, 39, 40, 41, 42, 43], colors: ['Đen', 'Trắng', 'Xanh'], material: 'Gel/Rubber', weight: '290g' }
+        ];
+
+        let products = [];
+
+        function initializeProducts() {
+            const storedProducts = localStorage.getItem('products');
+            if (storedProducts) {
+                products = JSON.parse(storedProducts);
+                if (products.length < defaultProducts.length) {
+                    products = defaultProducts;
+                    localStorage.setItem('products', JSON.stringify(products));
+                }
+            } else {
+                products = defaultProducts;
+                localStorage.setItem('products', JSON.stringify(products));
+            }
+            displayCategories();
+        }
+
+        function displayCategories() {
+            const container = document.getElementById('mainContainer');
+            const categories = [
+                { id: 'running', name: 'Giày chạy bộ', icon: 'fa-running', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600', description: 'Giày chạy bộ công nghệ cao, êm ái, bền bỉ cho mọi cung đường.' },
+                { id: 'training', name: 'Giày tập luyện', icon: 'fa-dumbbell', image: 'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=600', description: 'Đa năng, chắc chắn, lý tưởng cho CrossFit và các bài tập thể lực.' },
+                { id: 'basketball', name: 'Giày bóng rổ', icon: 'fa-basketball-ball', image: 'https://images.unsplash.com/photo-1515955656352-a1fa3ffcd111?w=600', description: 'Bật nhảy, ổn định, bảo vệ cổ chân tối ưu trên sân đấu.' },
+                { id: 'football', name: 'Giày bóng đá', icon: 'fa-futbol', image: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=600', description: 'Cảm giác bóng tuyệt vời, tăng tốc đột phá trên sân cỏ.' },
+                { id: 'tennis', name: 'Giày tennis', icon: 'fa-table-tennis', image: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600', description: 'Chịu mài mòn tốt, hỗ trợ di chuyển linh hoạt.' },
+                { id: 'badminton', name: 'Giày cầu lông', icon: 'fa-badminton', image: 'https://images.unsplash.com/photo-1543508282-6319a3e2621f?w=600', description: 'Siêu nhẹ, bám sân tốt, giúp phản xạ nhanh hơn.' },
+                { id: 'walking', name: 'Giày đi bộ', icon: 'fa-hiking', image: 'https://images.unsplash.com/photo-1518002171953-a080ee817e1f?w=600', description: 'Thoải mái suốt ngày dài, đệm êm cho mọi bước chân.' }
+            ];
+            
+            let html = `<h2 class="section-title">Danh mục sản phẩm</h2><div class="categories-container">`;
+            categories.forEach(cat => {
+                html += `
+                    <div class="category-item" onclick="displayProductsByCategory('${cat.id}')">
+                        <div class="category-image"><img src="${cat.image}" alt="${cat.name}" onerror="this.src='https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400'"></div>
+                        <div class="category-content"><i class="fas ${cat.icon} category-icon"></i><h3 class="category-name">${cat.name}</h3><p class="category-description">${cat.description}</p><button class="category-btn">Xem sản phẩm</button></div>
+                    </div>`;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function displayProductsByCategory(categoryId) {
+            const container = document.getElementById('mainContainer');
+            const categoryNames = { 'running': 'Giày chạy bộ', 'training': 'Giày tập luyện', 'basketball': 'Giày bóng rổ', 'football': 'Giày bóng đá', 'tennis': 'Giày tennis', 'badminton': 'Giày cầu lông', 'walking': 'Giày đi bộ' };
+            const categoryProducts = products.filter(p => p.category === categoryId);
+            
+            let html = `<div class="back-header"><h2><i class="fas fa-${categoryId === 'running' ? 'running' : categoryId === 'training' ? 'dumbbell' : categoryId === 'basketball' ? 'basketball-ball' : categoryId === 'football' ? 'futbol' : categoryId === 'tennis' ? 'table-tennis' : categoryId === 'badminton' ? 'badminton' : 'hiking'}"></i> ${categoryNames[categoryId]}</h2><button class="back-btn" onclick="displayCategories()"><i class="fas fa-arrow-left"></i> Quay lại danh mục</button></div><div class="product-grid">`;
+            
+            categoryProducts.forEach(p => {
+                const discount = p.oldPrice ? `<span class="product-badge">-${Math.round((p.oldPrice - p.price) / p.oldPrice * 100)}%</span>` : '';
+                const oldPriceHtml = p.oldPrice ? `<span class="old-price">${formatPrice(p.oldPrice)}</span>` : '';
+                const ratingStars = renderStars(p.rating || 4.5);
+                
+                html += `
+                    <div class="product-card" data-id="${p.id}">
+                        ${discount}
+                        <div class="product-image"><img src="${p.image}" alt="${p.name}" onerror="this.src='https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400'"><div class="product-actions"><button class="action-btn" onclick="event.stopPropagation(); addToWishlist('${p.id}')"><i class="fas fa-heart"></i></button><button class="action-btn" onclick="event.stopPropagation(); addToCart('${p.id}')"><i class="fas fa-shopping-cart"></i></button><button class="action-btn" onclick="event.stopPropagation(); quickView('${p.id}')"><i class="fas fa-eye"></i></button></div></div>
+                        <div class="product-info"><div class="product-category">${p.brand}</div><div class="product-name">${p.name}</div><div class="product-rating">${ratingStars}</div><div class="product-price"><span class="current-price">${formatPrice(p.price)}</span>${oldPriceHtml}</div><div class="sold-count">Đã bán: ${p.sold || 0}</div></div>
+                    </div>`;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+            
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.addEventListener('click', () => window.location.href = `product-detail.html?id=${card.getAttribute('data-id')}`);
+            });
+        }
+
+        function formatPrice(price) { return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + 'đ'; }
+        function renderStars(rating) {
+            let stars = '';
+            const full = Math.floor(rating);
+            const half = rating % 1 >= 0.5;
+            for (let i = 0; i < full; i++) stars += '<i class="fas fa-star"></i>';
+            if (half) stars += '<i class="fas fa-star-half-alt"></i>';
+            for (let i = stars.length; i < 5; i++) stars += '<i class="far fa-star"></i>';
+            return stars;
+        }
+
+        function addToCart(productId) {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser')) || JSON.parse(localStorage.getItem('rememberedUser'));
+            if (!currentUser) { if(confirm('Cần đăng nhập để thêm vào giỏ!')) window.location.href='login.html'; return; }
+            const product = products.find(p => p.id == productId);
+            if (!product) return;
+            if (product.stock === 0) { showNotification('Sản phẩm đã hết hàng!', 'error'); return; }
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const existing = cart.find(item => item.id == productId);
+            if (existing) { if(existing.quantity + 1 > product.stock) { showNotification(`Chỉ còn ${product.stock} sản phẩm!`, 'warning'); return; } existing.quantity++; }
+            else cart.push({ id: product.id, name: product.name, price: product.price, image: product.image, quantity: 1, brand: product.brand });
+            localStorage.setItem('cart', JSON.stringify(cart));
+            showNotification(`Đã thêm ${product.name} vào giỏ hàng!`, 'success');
+            updateCartCount();
+        }
+        
+        function addToWishlist(productId) {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser')) || JSON.parse(localStorage.getItem('rememberedUser'));
+            if (!currentUser) { if(confirm('Cần đăng nhập để thêm vào yêu thích!')) window.location.href='login.html'; return; }
+            const product = products.find(p => p.id == productId);
+            if (!product) return;
+            let wishlist = JSON.parse(localStorage.getItem('wishlist_' + currentUser.id)) || [];
+            if (!wishlist.includes(productId)) { wishlist.push(productId); localStorage.setItem('wishlist_' + currentUser.id, JSON.stringify(wishlist)); showNotification(`Đã thêm ${product.name} vào yêu thích!`, 'success'); }
+            else showNotification('Sản phẩm đã có trong yêu thích!', 'info');
+        }
+        
+        function quickView(productId) { const p = products.find(p => p.id == productId); if(p) showNotification(`${p.name}\n💰 ${formatPrice(p.price)}\n📦 Tồn kho: ${p.stock}`, 'info'); }
+        
+        function updateCartCount() { const cart = JSON.parse(localStorage.getItem('cart')) || []; const count = cart.reduce((s, i) => s + i.quantity, 0); document.querySelectorAll('#cartCount').forEach(el => { if(el) el.textContent = count; }); }
+        
+        function showNotification(msg, type='success') {
+            const n = document.createElement('div'); n.className=`notification ${type}`; n.innerHTML=`<i class="fas ${type==='success'?'fa-check-circle':type==='error'?'fa-exclamation-circle':'fa-info-circle'}"></i> ${msg}`;
+            document.body.appendChild(n); setTimeout(()=>{ n.style.animation='slideOut 0.3s ease'; setTimeout(()=>n.remove(),300); }, 3000);
+        }
+
+        function updateUserMenu() {
+            const userMenu = document.getElementById('userMenu');
+            if(!userMenu) return;
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser')) || JSON.parse(localStorage.getItem('rememberedUser'));
+            if(currentUser) {
+                userMenu.innerHTML = `<div class="search-box"><input type="text" placeholder="Tìm kiếm..." id="searchInput"><button onclick="searchProducts()"><i class="fas fa-search"></i></button></div><div class="user-menu"><div class="cart-icon" onclick="window.location.href='user.html?tab=cart'"><i class="fas fa-shopping-cart"></i><span class="cart-count" id="cartCount">0</span></div><div class="user-dropdown"><div class="user-info" onclick="toggleDropdown()"><img src="${currentUser.avatar}" class="user-avatar"><span>${currentUser.name}</span><i class="fas fa-chevron-down"></i></div><div class="user-dropdown-menu" id="dropdownMenu"><a href="${currentUser.role==='admin'?'admin.html':'user.html'}?tab=profile"><i class="fas fa-user"></i> Hồ sơ</a><a href="${currentUser.role==='admin'?'admin.html':'user.html'}?tab=cart"><i class="fas fa-shopping-cart"></i> Giỏ hàng</a><a href="${currentUser.role==='admin'?'admin.html':'user.html'}?tab=orders"><i class="fas fa-history"></i> Lịch sử</a><div class="dropdown-divider"></div><a href="#" onclick="logout()" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></div></div></div>`;
+                updateCartCount();
+            } else {
+                userMenu.innerHTML = `<div class="search-box"><input type="text" placeholder="Tìm kiếm..." id="searchInput"><button onclick="searchProducts()"><i class="fas fa-search"></i></button></div><div class="auth-links"><a href="login.html" class="login-link"><i class="fas fa-user"></i> Đăng nhập</a></div>`;
+            }
+        }
+        
+        function toggleDropdown() { document.getElementById('dropdownMenu')?.classList.toggle('show'); }
+        function searchProducts() { const kw = document.getElementById('searchInput')?.value.trim(); if(kw) window.location.href = `index.html?search=${encodeURIComponent(kw)}`; else showNotification('Nhập từ khóa!','warning'); }
+        function logout() { if(confirm('Đăng xuất?')){ sessionStorage.clear(); localStorage.removeItem('rememberedUser'); window.location.href='index.html'; } }
+        window.onclick = function(e) { if(!e.target.closest('.user-dropdown')) document.getElementById('dropdownMenu')?.classList.remove('show'); }
+        
+        document.addEventListener('DOMContentLoaded', function() { initializeProducts(); updateUserMenu(); });
+    </script>
+</body>
+</html>

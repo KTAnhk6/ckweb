@@ -1,0 +1,26 @@
+/* header.css */
+.header-content {
+    display: flex;
+    justify-content: space-between; /* Đẩy 3 phần về 3 hướng */
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative; /* Làm gốc cho nav-menu căn giữa */
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 30px;
+    /* Kỹ thuật căn giữa tuyệt đối */
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.search-cart {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}

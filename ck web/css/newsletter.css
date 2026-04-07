@@ -1,0 +1,43 @@
+/* Newsletter Section */
+.newsletter {
+    padding: 4rem 0;
+    background: #f9f9f9;
+    text-align: center;
+}
+
+.newsletter p {
+    color: #666;
+}
+
+.newsletter-form {
+    max-width: 500px;
+    margin: 2rem auto 0;
+    display: flex;
+    gap: 1rem;
+}
+
+.newsletter-form input {
+    flex: 1;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+}
+
+.newsletter-form input:focus {
+    border-color: #764ba2;
+}
+
+.newsletter-form button {
+    padding: 1rem 2rem;
+    background: #764ba2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.newsletter-form button:hover {
+    background: #667eea;
+}

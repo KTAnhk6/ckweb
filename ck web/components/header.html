@@ -1,0 +1,152 @@
+<header>
+    <div class="container">
+        <div class="header-content">
+            <a href="index.html" class="logo">Sneaker<span>Store</span></a>
+            
+            <ul class="nav-menu">
+                <li><a href="index.html">Trang chủ</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Danh mục <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-menu">
+                        <a href="#" onclick="filterByCategory('running')">
+                            <i class="fas fa-running"></i> Giày chạy bộ
+                        </a>
+                        <a href="#" onclick="filterByCategory('training')">
+                            <i class="fas fa-dumbbell"></i> Giày tập luyện đa năng
+                        </a>
+                        <a href="#" onclick="filterByCategory('basketball')">
+                            <i class="fas fa-basketball-ball"></i> Giày bóng rổ
+                        </a>
+                        <a href="#" onclick="filterByCategory('football')">
+                            <i class="fas fa-futbol"></i> Giày bóng đá
+                        </a>
+                        <a href="#" onclick="filterByCategory('tennis')">
+                            <i class="fas fa-table-tennis"></i> Giày tennis
+                        </a>
+                        <a href="#" onclick="filterByCategory('badminton')">
+                            <i class="fas fa-badminton"></i> Giày cầu lông
+                        </a>
+                        <a href="#" onclick="filterByCategory('walking')">
+                            <i class="fas fa-hiking"></i> Giày đi bộ
+                        </a>
+                    </div>
+                </li>
+                <li><a href="#products">Sản phẩm</a></li>
+                <li><a href="#">Khuyến mãi</a></li>
+                <li><a href="#">Liên hệ</a></li>
+            </ul>
+
+            <div class="search-cart" id="userMenu">
+                <div class="search-box">
+                    <input type="text" placeholder="Tìm kiếm..." id="searchInput">
+                    <button onclick="searchProducts()"><i class="fas fa-search"></i></button>
+                </div>
+                <div class="auth-links">
+                    <a href="login.html" class="login-link">
+                        <i class="fas fa-user"></i> Đăng nhập
+                    </a>
+                    <a href="register.html" class="register-link">
+                        <i class="fas fa-user-plus"></i> Đăng ký
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<style>
+    /* Dropdown styles */
+    .dropdown {
+        position: relative;
+    }
+
+    .dropdown-toggle {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 250px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        padding: 10px 0;
+        display: none;
+        z-index: 1000;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .dropdown:hover .dropdown-menu {
+        display: block;
+    }
+
+    .dropdown-menu a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 20px;
+        color: #333;
+        text-decoration: none;
+        transition: all 0.3s;
+        border-left: 3px solid transparent;
+    }
+
+    .dropdown-menu a:hover {
+        background: #f8f9fa;
+        border-left-color: #764ba2;
+        color: #764ba2;
+        padding-left: 25px;
+    }
+
+    .dropdown-menu a i {
+        width: 20px;
+        color: #764ba2;
+    }
+
+    .auth-links {
+        display: flex;
+        gap: 10px;
+    }
+
+    .login-link, .register-link {
+        padding: 8px 16px;
+        border-radius: 20px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+
+    .login-link {
+        background: rgba(255,255,255,0.2);
+        color: white;
+    }
+
+    .register-link {
+        background: #ffd700;
+        color: #333;
+    }
+
+    .login-link:hover {
+        background: rgba(255,255,255,0.3);
+    }
+
+    .register-link:hover {
+        background: #ffed4a;
+        transform: translateY(-2px);
+    }
+</style>

@@ -1,0 +1,2282 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - SneakerStore</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f5f5f5;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header .logo {
+            font-size: 1.8rem;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar-header .logo span {
+            color: #ffd700;
+        }
+
+        .sidebar-header p {
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
+        .admin-info {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+        }
+
+        .admin-details h4 {
+            margin-bottom: 0.2rem;
+        }
+
+        .admin-details p {
+            opacity: 0.8;
+            font-size: 0.85rem;
+        }
+
+        .sidebar-nav {
+            padding: 1.5rem 0;
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav a i {
+            width: 20px;
+        }
+
+        .sidebar-nav li:hover a,
+        .sidebar-nav li.active a {
+            background: rgba(255, 255, 255, 0.1);
+            opacity: 1;
+            border-left: 3px solid #ffd700;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-header h1 {
+            font-size: 1.8rem;
+            color: #333;
+        }
+
+        .date-time {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .realtime-badge {
+            background: #28a745;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-left: 1rem;
+        }
+
+        .last-update {
+            font-size: 0.8rem;
+            color: #666;
+            margin-left: 1rem;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* STATS CARDS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-icon i {
+            font-size: 2rem;
+            color: white;
+        }
+
+        .stat-info h3 {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* CHARTS */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-card h3 {
+            margin-bottom: 1rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-card h3 i {
+            color: #764ba2;
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        /* TABLES */
+        .data-table {
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: left;
+        }
+
+        .data-table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.3s;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: inline-block;
+        }
+
+        .status-badge.in-stock {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.low-stock {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-badge.out-of-stock {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-badge.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.processing {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: #764ba2;
+            cursor: pointer;
+            margin: 0 0.3rem;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            color: #5a3d7a;
+            transform: scale(1.1);
+        }
+
+        .delete-btn {
+            color: #dc3545;
+        }
+
+        .delete-btn:hover {
+            color: #c82333;
+        }
+
+        /* INVENTORY SECTION */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .inventory-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .filter-select {
+            width: 200px;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-header h2 i {
+            color: #764ba2;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-btn:hover {
+            color: #dc3545;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .form-group label i {
+            margin-right: 0.5rem;
+            color: #764ba2;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #764ba2;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .image-preview {
+            margin-top: 1rem;
+            width: 100%;
+            height: 200px;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .image-preview i {
+            font-size: 3rem;
+            color: #ccc;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 2px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .btn-secondary {
+            padding: 0.8rem 1.5rem;
+            background: #f0f0f0;
+            color: #666;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-save {
+            padding: 0.8rem 1.5rem;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-save:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        /* REPORT MODAL */
+        .report-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .report-modal.show {
+            display: flex;
+        }
+
+        .report-modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 95%;
+            max-width: 1200px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .report-header {
+            padding: 1.5rem;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+        }
+
+        .report-header h2 {
+            font-size: 1.8rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .report-header h2 i {
+            color: #764ba2;
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .report-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .report-btn.excel {
+            background: #28a745;
+            color: white;
+        }
+
+        .report-btn.pdf {
+            background: #dc3545;
+            color: white;
+        }
+
+        .report-btn.print {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .report-btn.close {
+            background: #6c757d;
+            color: white;
+        }
+
+        .report-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .report-body {
+            padding: 1.5rem;
+        }
+
+        .report-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .report-summary-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .report-summary-item .value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .report-table-container {
+            overflow-x: auto;
+            margin-bottom: 2rem;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .report-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .report-table th,
+        .report-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .report-table tfoot {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .report-footer {
+            padding: 1.5rem;
+            border-top: 2px solid #f0f0f0;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* CATEGORY STATS */
+        .category-stats {
+            margin-top: 2rem;
+        }
+
+        .category-stats h3 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .category-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .category-stat-item {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .category-stat-item h4 {
+            margin-bottom: 1rem;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .stat-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #764ba2;
+        }
+
+        .metric-label {
+            display: block;
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        /* STATISTICS STYLES */
+        .stats-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-period {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .period-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e0e0e0;
+            background: white;
+            color: #666;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .period-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .period-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .category-filter {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .category-select {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            color: #333;
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-detail-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-detail-card h4 {
+            margin-bottom: 1rem;
+            color: #333;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.9rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 15px;
+            font-weight: 600;
+        }
+
+        .stat-change.positive {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .stat-change.negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .stat-sub {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .inventory-filters {
+                flex-direction: column;
+            }
+
+            .filter-select {
+                width: 100%;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                width: 0;
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .inventory-filters {
+                flex-direction: column;
+            }
+
+            .filter-select {
+                width: 100%;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media print {
+
+            .report-header,
+            .report-actions,
+            .report-footer {
+                display: none;
+            }
+        }
+
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 9999;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-notification.info {
+            background: #17a2b8;
+        }
+
+        .toast-notification.warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .toast-notification.error {
+            background: #dc3545;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">Sneaker<span>Store</span></a>
+                <p>Admin Panel</p>
+            </div>
+            <div class="admin-info" id="adminInfo"></div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active"><a href="#" onclick="showSection('dashboard'); return false;"><i
+                                class="fas fa-tachometer-alt"></i> Tổng quan</a></li>
+                    <li><a href="#" onclick="showSection('inventory'); return false;"><i class="fas fa-box"></i> Hàng
+                            tồn kho</a></li>
+                    <li><a href="#" onclick="showSection('statistics'); return false;"><i class="fas fa-chart-bar"></i>
+                            Thống kê</a></li>
+                    <li><a href="#" onclick="showSection('orders'); return false;"><i class="fas fa-shopping-cart"></i>
+                            Đơn hàng</a></li>
+                    <li><a href="#" onclick="showSection('users'); return false;"><i class="fas fa-users"></i> Người
+                            dùng</a></li>
+                    <li><a href="#" onclick="showSection('products'); return false;"><i class="fas fa-shoe-prints"></i>
+                            Sản phẩm</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="content-header">
+                <div>
+                    <h1 id="pageTitle">Tổng quan</h1>
+                    <span class="realtime-badge"><i class="fas fa-sync-alt"></i> Real-time</span>
+                    <span class="last-update" id="lastUpdateTime"><i class="far fa-clock"></i> Cập nhật lúc: --</span>
+                </div>
+                <div class="date-time" id="currentDateTime"></div>
+            </div>
+
+            <!-- DASHBOARD SECTION -->
+            <div id="dashboard" class="content-section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-shoe-prints"></i></div>
+                        <div class="stat-info">
+                            <h3>Tổng sản phẩm</h3>
+                            <div class="stat-value" id="totalProducts">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-box"></i></div>
+                        <div class="stat-info">
+                            <h3>Tồn kho</h3>
+                            <div class="stat-value" id="totalInventory">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+                        <div class="stat-info">
+                            <h3>Đơn hàng</h3>
+                            <div class="stat-value" id="totalOrders">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-info">
+                            <h3>Người dùng</h3>
+                            <div class="stat-value" id="totalUsers">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                        <div class="stat-info">
+                            <h3>Doanh thu</h3>
+                            <div class="stat-value" id="totalRevenue">0đ</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3><i class="fas fa-chart-pie"></i> Tồn kho theo danh mục</h3>
+                        <div class="chart-container"><canvas id="inventoryChart"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3><i class="fas fa-chart-line"></i> Doanh thu 7 ngày</h3>
+                        <div class="chart-container"><canvas id="revenueChart"></canvas></div>
+                    </div>
+                </div>
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3><i class="fas fa-chart-bar"></i> Top 5 sản phẩm bán chạy</h3>
+                        <div class="chart-container"><canvas id="topProductsChart"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3><i class="fas fa-chart-pie"></i> Đơn hàng theo trạng thái</h3>
+                        <div class="chart-container"><canvas id="orderStatusChart"></canvas></div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3><i class="fas fa-clock"></i> Đơn hàng gần đây</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Mã đơn</th>
+                                <th>Khách hàng</th>
+                                <th>Sản phẩm</th>
+                                <th>Tổng tiền</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentOrdersTable">
+                            <tr>
+                                <td colspan="5" style="text-align: center;">Đang tải dữ liệu...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- INVENTORY SECTION -->
+            <div id="inventory" class="content-section">
+                <div class="section-header">
+                    <h2>Quản lý hàng tồn kho</h2>
+                    <div><button class="btn-primary" onclick="viewInventoryReport()" style="background: #17a2b8;"><i
+                                class="fas fa-eye"></i> Xem báo cáo</button><button class="btn-primary"
+                            onclick="exportInventory()" style="margin-left:10px;"><i class="fas fa-download"></i> Xuất
+                            PDF</button></div>
+                </div>
+                <div class="inventory-filters"><input type="text" id="searchInventory"
+                        placeholder="Tìm kiếm sản phẩm..." class="search-input"><select id="filterCategory"
+                        class="filter-select">
+                        <option value="">Tất cả danh mục</option>
+                        <option value="Nike">Nike</option>
+                        <option value="Adidas">Adidas</option>
+                        <option value="Asics">Asics</option>
+                        <option value="Hoka">Hoka</option>
+                        <option value="Reebok">Reebok</option>
+                        <option value="Under Armour">Under Armour</option>
+                        <option value="Puma">Puma</option>
+                        <option value="Yonex">Yonex</option>
+                        <option value="Li-Ning">Li-Ning</option>
+                        <option value="Victor">Victor</option>
+                        <option value="Skechers">Skechers</option>
+                        <option value="New Balance">New Balance</option>
+                    </select></div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Mã SP</th>
+                            <th>Hình ảnh</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Danh mục</th>
+                            <th>Thương hiệu</th>
+                            <th>Giá bán</th>
+                            <th>Tồn kho</th>
+                            <th>Đã bán</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryTable">
+                        <tr>
+                            <td colspan="10" style="text-align: center;">Đang tải dữ liệu...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- STATISTICS SECTION -->
+            <div id="statistics" class="content-section">
+                <h2>Thống kê chi tiết</h2>
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;"><button class="btn-primary"
+                        onclick="viewRevenueReport()" style="background: #28a745;"><i class="fas fa-chart-line"></i> Xem
+                        doanh thu</button><button class="btn-primary" onclick="viewCategoryReport()"
+                        style="background: #17a2b8;"><i class="fas fa-chart-pie"></i> Xem danh mục</button><button
+                        class="btn-primary" onclick="viewInventoryReport()" style="background: #ffc107; color:#333;"><i
+                            class="fas fa-box"></i> Xem tồn kho</button></div>
+                <div class="stats-controls">
+                    <div class="stats-period"><button class="period-btn active" onclick="changePeriod('day', this)">Hôm
+                            nay</button><button class="period-btn" onclick="changePeriod('week', this)">Tuần
+                            này</button><button class="period-btn" onclick="changePeriod('month', this)">Tháng
+                            này</button><button class="period-btn" onclick="changePeriod('year', this)">Năm nay</button>
+                    </div>
+                    <div class="category-filter"><select id="statCategoryFilter" class="category-select"
+                            onchange="filterByCategory()">
+                            <option value="all">📊 Tất cả danh mục</option>
+                            <option value="running">🏃 Giày chạy bộ</option>
+                            <option value="training">🏋️ Giày tập luyện</option>
+                            <option value="basketball">🏀 Giày bóng rổ</option>
+                            <option value="football">⚽ Giày bóng đá</option>
+                            <option value="tennis">🎾 Giày tennis</option>
+                            <option value="badminton">🏸 Giày cầu lông</option>
+                            <option value="walking">🚶 Giày đi bộ</option>
+                        </select></div>
+                </div>
+                <div class="stats-cards">
+                    <div class="stat-detail-card">
+                        <h4><i class="fas fa-shopping-cart"></i> Đơn hàng</h4>
+                        <div class="stat-number" id="statOrders">0</div><span class="stat-change positive"
+                            id="orderChange">+0%</span>
+                        <div class="stat-sub" id="orderSub">Tổng số đơn hàng</div>
+                    </div>
+                    <div class="stat-detail-card">
+                        <h4><i class="fas fa-dollar-sign"></i> Doanh thu</h4>
+                        <div class="stat-number" id="statRevenue">0đ</div><span class="stat-change positive"
+                            id="revenueChange">+0%</span>
+                        <div class="stat-sub" id="revenueSub">Tổng doanh thu</div>
+                    </div>
+                    <div class="stat-detail-card">
+                        <h4><i class="fas fa-chart-line"></i> Lợi nhuận</h4>
+                        <div class="stat-number" id="statProfit">0đ</div><span class="stat-change positive"
+                            id="profitChange">+0%</span>
+                        <div class="stat-sub" id="profitSub">Lợi nhuận ước tính</div>
+                    </div>
+                    <div class="stat-detail-card">
+                        <h4><i class="fas fa-box"></i> Sản phẩm</h4>
+                        <div class="stat-number" id="statProducts">0</div><span class="stat-change" id="productChange">0
+                            sản phẩm</span>
+                        <div class="stat-sub" id="productSub">Trong danh mục</div>
+                    </div>
+                </div>
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3><i class="fas fa-chart-pie"></i> Doanh thu theo danh mục</h3>
+                        <div class="chart-container"><canvas id="categoryRevenueChart"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <h3><i class="fas fa-chart-line"></i> Tăng trưởng doanh thu</h3>
+                        <div class="chart-container"><canvas id="growthChart"></canvas></div>
+                    </div>
+                </div>
+                <div class="category-stats">
+                    <h3><i class="fas fa-chart-pie"></i> Thống kê theo danh mục</h3>
+                    <div class="category-stats-grid" id="categoryStats"></div>
+                </div>
+                <div class="chart-card">
+                    <h3><i class="fas fa-list"></i> Sản phẩm trong danh mục <span id="selectedCategoryName"></span></h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Mã SP</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Thương hiệu</th>
+                                <th>Giá</th>
+                                <th>Đã bán</th>
+                                <th>Doanh thu</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoryProductsTable">
+                            <tr>
+                                <td colspan="6" style="text-align: center;">Chọn danh mục để xem sản phẩm</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ORDERS SECTION -->
+            <div id="orders" class="content-section">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                    <h2>Quản lý đơn hàng</h2><button class="btn-primary" onclick="viewOrdersReport()"
+                        style="background: #17a2b8;"><i class="fas fa-eye"></i> Xem báo cáo</button>
+                </div>
+                <div style="margin-bottom: 1rem; display: flex; gap: 1rem;"><input type="text" id="searchOrders"
+                        placeholder="Tìm kiếm theo mã đơn, khách hàng..." class="search-input" style="flex:1;"><select
+                        id="orderStatusFilter" class="filter-select" style="width:150px;">
+                        <option value="all">Tất cả trạng thái</option>
+                        <option value="pending">Chờ xử lý</option>
+                        <option value="processing">Đang xử lý</option>
+                        <option value="completed">Hoàn thành</option>
+                        <option value="cancelled">Đã hủy</option>
+                    </select></div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Mã đơn</th>
+                            <th>Khách hàng</th>
+                            <th>Ngày đặt</th>
+                            <th>Sản phẩm</th>
+                            <th>Tổng tiền</th>
+                            <th>Trạng thái</th>
+                            <th>Thanh toán</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTable">
+                        <tr>
+                            <td colspan="8" style="text-align: center;">Đang tải dữ liệu...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- USERS SECTION -->
+            <div id="users" class="content-section">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                    <h2>Quản lý người dùng</h2><button class="btn-primary" onclick="viewUsersReport()"
+                        style="background: #17a2b8;"><i class="fas fa-eye"></i> Xem báo cáo</button>
+                </div>
+                <div style="margin-bottom: 1rem; display: flex; gap: 1rem;"><input type="text" id="searchUsers"
+                        placeholder="Tìm kiếm..." class="search-input" style="flex:1;"><select id="userRoleFilter"
+                        class="filter-select" style="width:150px;">
+                        <option value="all">Tất cả vai trò</option>
+                        <option value="admin">Admin</option>
+                        <option value="user">User</option>
+                    </select><select id="userStatusFilter" class="filter-select" style="width:150px;">
+                        <option value="all">Tất cả trạng thái</option>
+                        <option value="active">Hoạt động</option>
+                        <option value="inactive">Không hoạt động</option>
+                        <option value="pending">Chờ xác thực</option>
+                    </select></div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Avatar</th>
+                            <th>Tên</th>
+                            <th>Email</th>
+                            <th>SĐT</th>
+                            <th>Vai trò</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày tham gia</th>
+                            <th>Đơn hàng</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTable">
+                        <tr>
+                            <td colspan="10" style="text-align: center;">Đang tải dữ liệu...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- PRODUCTS SECTION -->
+            <div id="products" class="content-section">
+                <div class="section-header">
+                    <h2>Quản lý sản phẩm</h2><button class="btn-primary" onclick="openAddProductModal()"><i
+                            class="fas fa-plus"></i> Thêm sản phẩm mới</button>
+                </div>
+                <div class="inventory-filters"><input type="text" id="searchProducts" placeholder="Tìm kiếm sản phẩm..."
+                        class="search-input"><select id="productCategory" class="filter-select">
+                        <option value="">Tất cả danh mục</option>
+                        <option value="running">🏃 Giày chạy bộ</option>
+                        <option value="training">🏋️ Giày tập luyện</option>
+                        <option value="basketball">🏀 Giày bóng rổ</option>
+                        <option value="football">⚽ Giày bóng đá</option>
+                        <option value="tennis">🎾 Giày tennis</option>
+                        <option value="badminton">🏸 Giày cầu lông</option>
+                        <option value="walking">🚶 Giày đi bộ</option>
+                    </select></div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Mã SP</th>
+                            <th>Hình ảnh</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Danh mục</th>
+                            <th>Thương hiệu</th>
+                            <th>Giá</th>
+                            <th>Tồn kho</th>
+                            <th>Đã bán</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal" id="addProductModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-plus-circle"></i> Thêm sản phẩm mới</h2><button class="close-btn"
+                    onclick="closeModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="addProductForm">
+                    <div class="form-group"><label><i class="fas fa-tag"></i> Tên sản phẩm</label><input type="text"
+                            id="productName" required></div>
+                    <div class="form-row">
+                        <div class="form-group"><label><i class="fas fa-list"></i> Danh mục</label><select
+                                id="productCategorySelect" required>
+                                <option value="">Chọn danh mục</option>
+                                <option value="running">🏃 Giày chạy bộ</option>
+                                <option value="training">🏋️ Giày tập luyện</option>
+                                <option value="basketball">🏀 Giày bóng rổ</option>
+                                <option value="football">⚽ Giày bóng đá</option>
+                                <option value="tennis">🎾 Giày tennis</option>
+                                <option value="badminton">🏸 Giày cầu lông</option>
+                                <option value="walking">🚶 Giày đi bộ</option>
+                            </select></div>
+                        <div class="form-group"><label><i class="fas fa-trademark"></i> Thương hiệu</label><input
+                                type="text" id="productBrand" required></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label><i class="fas fa-barcode"></i> Mã sản phẩm</label><input
+                                type="text" id="productCode" required></div>
+                        <div class="form-group"><label><i class="fas fa-dollar-sign"></i> Giá bán</label><input
+                                type="number" id="productPrice" required></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label><i class="fas fa-box"></i> Số lượng tồn kho</label><input
+                                type="number" id="productStock" required></div>
+                        <div class="form-group"><label><i class="fas fa-chart-line"></i> Đã bán</label><input
+                                type="number" id="productSold" value="0"></div>
+                    </div>
+                    <div class="form-group"><label><i class="fas fa-align-left"></i> Mô tả sản phẩm</label><textarea
+                            id="productDescription" rows="4"></textarea></div>
+                    <div class="form-group"><label><i class="fas fa-image"></i> Hình ảnh sản phẩm</label><input
+                            type="url" id="productImage" onchange="previewImage(this.value)">
+                        <div class="image-preview" id="imagePreview"><i class="fas fa-cloud-upload-alt"></i></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer"><button class="btn-secondary" onclick="closeModal()">Hủy</button><button
+                    class="btn-save" onclick="saveProduct()"><i class="fas fa-save"></i> Lưu sản phẩm</button></div>
+        </div>
+    </div>
+
+    <div class="modal" id="editProductModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-edit"></i> Sửa sản phẩm</h2><button class="close-btn" onclick="closeEditModal()"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="editProductForm"><input type="hidden" id="editProductId">
+                    <div class="form-group"><label><i class="fas fa-tag"></i> Tên sản phẩm</label><input type="text"
+                            id="editProductName" required></div>
+                    <div class="form-row">
+                        <div class="form-group"><label><i class="fas fa-list"></i> Danh mục</label><select
+                                id="editProductCategory" required>
+                                <option value="running">🏃 Giày chạy bộ</option>
+                                <option value="training">🏋️ Giày tập luyện</option>
+                                <option value="basketball">🏀 Giày bóng rổ</option>
+                                <option value="football">⚽ Giày bóng đá</option>
+                                <option value="tennis">🎾 Giày tennis</option>
+                                <option value="badminton">🏸 Giày cầu lông</option>
+                                <option value="walking">🚶 Giày đi bộ</option>
+                            </select></div>
+                        <div class="form-group"><label><i class="fas fa-trademark"></i> Thương hiệu</label><input
+                                type="text" id="editProductBrand" required></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label><i class="fas fa-barcode"></i> Mã sản phẩm</label><input
+                                type="text" id="editProductCode" required></div>
+                        <div class="form-group"><label><i class="fas fa-dollar-sign"></i> Giá bán</label><input
+                                type="number" id="editProductPrice" required></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label><i class="fas fa-box"></i> Số lượng tồn kho</label><input
+                                type="number" id="editProductStock" required></div>
+                        <div class="form-group"><label><i class="fas fa-chart-line"></i> Đã bán</label><input
+                                type="number" id="editProductSold" required></div>
+                    </div>
+                    <div class="form-group"><label><i class="fas fa-align-left"></i> Mô tả sản phẩm</label><textarea
+                            id="editProductDescription" rows="4"></textarea></div>
+                    <div class="form-group"><label><i class="fas fa-image"></i> Hình ảnh sản phẩm</label><input
+                            type="url" id="editProductImage" onchange="previewEditImage(this.value)">
+                        <div class="image-preview" id="editImagePreview"><i class="fas fa-cloud-upload-alt"></i></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer"><button class="btn-secondary" onclick="closeEditModal()">Hủy</button><button
+                    class="btn-save" onclick="updateProduct()"><i class="fas fa-save"></i> Cập nhật</button></div>
+        </div>
+    </div>
+
+    <div class="report-modal" id="reportModal">
+        <div class="report-modal-content">
+            <div class="report-header">
+                <h2 id="reportTitle"><i class="fas fa-chart-bar"></i> <span>Báo cáo</span></h2>
+                <div class="report-actions"><button class="report-btn excel" onclick="exportCurrentReportToExcel()"><i
+                            class="fas fa-file-excel"></i> Excel</button><button class="report-btn pdf"
+                        onclick="exportCurrentReportToPDF()"><i class="fas fa-file-pdf"></i> PDF</button><button
+                        class="report-btn print" onclick="printReport()"><i class="fas fa-print"></i> In</button><button
+                        class="report-btn close" onclick="closeReportModal()"><i class="fas fa-times"></i> Đóng</button>
+                </div>
+            </div>
+            <div class="report-body" id="reportBody"></div>
+            <div class="report-footer">
+                <p>SneakerStore - Báo cáo được tạo lúc <span id="reportDateTime"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATISTICS SECTION -->
+    <div id="statistics" class="content-section">
+        <h2>Thống kê chi tiết</h2>
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;"><button class="btn-primary"
+                onclick="viewRevenueReport()" style="background: #28a745;"><i class="fas fa-chart-line"></i> Xem doanh
+                thu</button><button class="btn-primary" onclick="viewCategoryReport()" style="background: #17a2b8;"><i
+                    class="fas fa-chart-pie"></i> Xem danh mục</button><button class="btn-primary"
+                onclick="viewInventoryReport()" style="background: #ffc107; color:#333;"><i class="fas fa-box"></i> Xem
+                tồn kho</button></div>
+        <div class="stats-controls">
+            <div class="stats-period"><button class="period-btn active" onclick="changePeriod('day', this)">Hôm
+                    nay</button><button class="period-btn" onclick="changePeriod('week', this)">Tuần này</button><button
+                    class="period-btn" onclick="changePeriod('month', this)">Tháng này</button><button
+                    class="period-btn" onclick="changePeriod('year', this)">Năm nay</button></div>
+            <div class="category-filter"><select id="statCategoryFilter" class="category-select"
+                    onchange="filterByCategory()">
+                    <option value="all">📊 Tất cả danh mục</option>
+                    <option value="running">🏃 Giày chạy bộ</option>
+                    <option value="training">🏋️ Giày tập luyện</option>
+                    <option value="basketball">🏀 Giày bóng rổ</option>
+                    <option value="football">⚽ Giày bóng đá</option>
+                    <option value="tennis">🎾 Giày tennis</option>
+                    <option value="badminton">🏸 Giày cầu lông</option>
+                    <option value="walking">🚶 Giày đi bộ</option>
+                </select></div>
+        </div>
+        <div class="stats-cards">
+            <div class="stat-detail-card">
+                <h4><i class="fas fa-shopping-cart"></i> Đơn hàng</h4>
+                <div class="stat-number" id="statOrders">0</div><span class="stat-change positive"
+                    id="orderChange">+0%</span>
+                <div class="stat-sub" id="orderSub">Tổng số đơn hàng</div>
+            </div>
+            <div class="stat-detail-card">
+                <h4><i class="fas fa-dollar-sign"></i> Doanh thu</h4>
+                <div class="stat-number" id="statRevenue">0đ</div><span class="stat-change positive"
+                    id="revenueChange">+0%</span>
+                <div class="stat-sub" id="revenueSub">Tổng doanh thu</div>
+            </div>
+            <div class="stat-detail-card">
+                <h4><i class="fas fa-chart-line"></i> Lợi nhuận</h4>
+                <div class="stat-number" id="statProfit">0đ</div><span class="stat-change positive"
+                    id="profitChange">+0%</span>
+                <div class="stat-sub" id="profitSub">Lợi nhuận ước tính</div>
+            </div>
+            <div class="stat-detail-card">
+                <h4><i class="fas fa-box"></i> Sản phẩm</h4>
+                <div class="stat-number" id="statProducts">0</div><span class="stat-change" id="productChange">0 sản
+                    phẩm</span>
+                <div class="stat-sub" id="productSub">Trong danh mục</div>
+            </div>
+        </div>
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-pie"></i> Doanh thu theo danh mục</h3>
+                <div class="chart-container"><canvas id="categoryRevenueChart"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-line"></i> Tăng trưởng doanh thu</h3>
+                <div class="chart-container"><canvas id="growthChart"></canvas></div>
+            </div>
+        </div>
+        <div class="category-stats">
+            <h3><i class="fas fa-chart-pie"></i> Thống kê theo danh mục</h3>
+            <div class="category-stats-grid" id="categoryStats"></div>
+        </div>
+        <div class="chart-card">
+            <h3><i class="fas fa-list"></i> Sản phẩm trong danh mục <span id="selectedCategoryName"></span></h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Mã SP</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Thương hiệu</th>
+                        <th>Giá</th>
+                        <th>Đã bán</th>
+                        <th>Doanh thu</th>
+                    </tr>
+                </thead>
+                <tbody id="categoryProductsTable">
+                    <tr>
+                        <td colspan="6" style="text-align: center;">Chọn danh mục để xem sản phẩm</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // ===== DỮ LIỆU SẢN PHẨM - 28 SẢN PHẨM (4 sản phẩm mỗi danh mục) =====
+        // Thay thế toàn bộ mảng products trong admin.html bằng:
+        let products = [
+            // Giày chạy bộ (4 sản phẩm)
+            { id: 'SP001', name: 'Nike Air Zoom Pegasus 40', category: 'running', brand: 'Nike', price: 1290000, oldPrice: 1490000, stock: 15, sold: 45, image: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400', status: 'low-stock' },
+            { id: 'SP002', name: 'Adidas Supernova Ease', category: 'running', brand: 'Adidas', price: 1390000, oldPrice: 0, stock: 22, sold: 38, image: 'https://assets.adidas.com/images/h_840,f_auto,q_auto,fl_lossy,c_fill,g_auto/cbe301e2c23440afb067b76516315a47_9366/Supernova_Ease_Shoes_White_IF9563_01_00_standard.jpg', status: 'in-stock' },
+            { id: 'SP003', name: 'Hoka Bondi 9', category: 'running', brand: 'Hoka', price: 1450000, oldPrice: 0, stock: 18, sold: 42, image: 'https://dms.deckers.com/hoka/image/upload/f_auto,q_40,dpr_2/b_rgb:f7f7f9/w_1110/v1732554715/1162011-BBLC_6.png?_s=RAABAB0', status: 'low-stock' },
+            { id: 'SP022', name: 'Puma Velocity Nitro 2', category: 'running', brand: 'Puma', price: 1380000, oldPrice: 0, stock: 18, sold: 28, image: 'https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_2000,h_2000/global/378529/01/sv01/fnd/SEA/fmt/png/Velocity-NITRO-2-Run-75-Running-Shoes-Men', status: 'low-stock' },
+
+            // Giày tập luyện (4 sản phẩm)
+            { id: 'SP004', name: 'Nike Metcon 9', category: 'training', brand: 'Nike', price: 1350000, oldPrice: 0, stock: 20, sold: 35, image: 'https://www.nike.ae/dw/image/v2/BDVB_PRD/on/demandware.static/-/Sites-akeneo-master-catalog/default/dwb4695d32/nk/5f5/3/a/9/a/0/5f53a9a0_10aa_4da4_a448_ef36dc04cf71.jpg', status: 'in-stock' },
+            { id: 'SP005', name: 'Reebok Nano X3', category: 'training', brand: 'Reebok', price: 1250000, oldPrice: 1450000, stock: 25, sold: 32, image: 'https://tse2.mm.bing.net/th/id/OIP.b7lbqAzuTL9LJ30TTWCPYwHaFn?rs=1&pid=ImgDetMain&o=7&rm=3', status: 'in-stock' },
+            { id: 'SP006', name: 'Under Armour TriBase Reign 4', category: 'training', brand: 'Under Armour', price: 1190000, oldPrice: 0, stock: 16, sold: 28, image: 'https://photo2.i-run.fr/under-armour-tribase-reign-4-m-chaussures-homme-532183-1-sz.jpg', status: 'low-stock' },
+            { id: 'SP023', name: 'Nike Free Metcon 5', category: 'training', brand: 'Nike', price: 1320000, oldPrice: 0, stock: 22, sold: 20, image: 'https://tse2.mm.bing.net/th/id/OIP.DJ00EGJxvxr0AhGLp9ae1wHaJQ?rs=1&pid=ImgDetMain&o=7&rm=3', status: 'in-stock' },
+
+            // Giày bóng rổ (4 sản phẩm)
+            { id: 'SP007', name: 'Nike LeBron XX', category: 'basketball', brand: 'Nike', price: 1490000, oldPrice: 0, stock: 14, sold: 40, image: 'https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/8c68dbb8-e288-43de-95ea-d7e887687597/LEBRON+XX+EP.png', status: 'low-stock' },
+            { id: 'SP008', name: 'Adidas Harden Vol. 7', category: 'basketball', brand: 'Adidas', price: 1420000, oldPrice: 0, stock: 19, sold: 36, image: 'https://tse1.mm.bing.net/th/id/OIP.nR7znjb9Fy_j90om8T6vzgHaFM?pid=ImgDet&w=474&h=332&rs=1&o=7&rm=3', status: 'low-stock' },
+            { id: 'SP009', name: 'Puma MB.02 LaMelo Ball', category: 'basketball', brand: 'Puma', price: 1380000, oldPrice: 1580000, stock: 21, sold: 44, image: 'https://tse1.mm.bing.net/th/id/OIP.OqVn12Q25Ew89h45NelTkAHaE8?rs=1&pid=ImgDetMain&o=7&rm=3', status: 'in-stock' },
+            { id: 'SP024', name: 'Jordan Ultra.Fly 3', category: 'basketball', brand: 'Jordan', price: 1440000, oldPrice: 0, stock: 17, sold: 23, image: 'https://image.goat.com/transform/v1/attachments/product_template_pictures/images/105/802/110/original/AO6224_004.png.png?action=crop&width=750', status: 'low-stock' },
+
+            // Giày bóng đá (4 sản phẩm)
+            { id: 'SP010', name: 'Nike Phantom GX Elite', category: 'football', brand: 'Nike', price: 1480000, oldPrice: 0, stock: 12, sold: 30, image: 'https://tse3.mm.bing.net/th/id/OIP.Q2NQSapOZvm3jo5cUggLxwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', status: 'low-stock' },
+            { id: 'SP011', name: 'Adidas Predator Accuracy.1', category: 'football', brand: 'Adidas', price: 1430000, oldPrice: 0, stock: 17, sold: 33, image: 'https://tse4.mm.bing.net/th/id/OIP.Nit-TYukLe_RHmVXom__vwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', status: 'low-stock' },
+            { id: 'SP012', name: 'Puma Ultra Ultimate', category: 'football', brand: 'Puma', price: 1280000, oldPrice: 1480000, stock: 23, sold: 29, image: 'https://tse1.mm.bing.net/th/id/OIP.Kf9fAeDUAHicsPrXNOShbwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', status: 'in-stock' },
+            { id: 'SP025', name: 'Adidas X Speedportal.1', category: 'football', brand: 'Adidas', price: 1460000, oldPrice: 0, stock: 14, sold: 26, image: 'https://images.prodirectsport.com/ProductImages/Main/281127_Main_Thumb_1372500.jpg', status: 'low-stock' },
+
+            // Giày tennis (4 sản phẩm)
+            { id: 'SP013', name: 'NikeCourt Vapor Pro', category: 'tennis', brand: 'Nike', price: 1320000, oldPrice: 1520000, stock: 24, sold: 41, image: 'https://tse4.mm.bing.net/th/id/OIP.7LtRqw1Fs-etUlij5YxJYwAAAA?pid=ImgDet&w=400&h=400&rs=1&o=7&rm=3', status: 'in-stock' },
+            { id: 'SP014', name: 'Adidas Ubersonic 4', category: 'tennis', brand: 'Adidas', price: 1370000, oldPrice: 0, stock: 20, sold: 37, image: 'https://assets.adidas.com/images/w_1880,f_auto,q_auto/998f76fc58f140b6a4caa22150037ac5_9366/IF9103_HM3_hover.jpg', status: 'in-stock' },
+            { id: 'SP015', name: 'Asics Gel-Resolution 9', category: 'tennis', brand: 'Asics', price: 1340000, oldPrice: 0, stock: 22, sold: 39, image: 'https://cdn.runrepeat.com/i/asics/39589/asics-gel-resolution-9-steel-blue-hazard-green-03d5-main.jpg', status: 'in-stock' },
+            { id: 'SP026', name: 'Wilson Rush Pro 3.5', category: 'tennis', brand: 'Wilson', price: 1360000, oldPrice: 0, stock: 21, sold: 29, image: 'https://tse3.mm.bing.net/th/id/OIP.aay7JpDfy00nv9bEmYojuwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', status: 'in-stock' },
+
+            // Giày cầu lông (4 sản phẩm)
+            { id: 'SP016', name: 'Yonex Aerus Z', category: 'badminton', brand: 'Yonex', price: 1250000, oldPrice: 1450000, stock: 26, sold: 48, image: 'https://tse4.mm.bing.net/th/id/OIP.hdXgtj13RY8-XjRLOWa_GAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3', status: 'in-stock' },
+            { id: 'SP017', name: 'Li-Ning Speed 9', category: 'badminton', brand: 'Li-Ning', price: 1180000, oldPrice: 0, stock: 28, sold: 50, image: 'https://wowsole.com/wp-content/uploads/2022/09/Li-Ning-Speed-9-Fred-VanVleet-Basketball-Shoes-Black-1200x1200.jpg', status: 'in-stock' },
+            { id: 'SP018', name: 'Victor Brave Sword 12', category: 'badminton', brand: 'Victor', price: 1220000, oldPrice: 0, stock: 24, sold: 43, image: 'https://badmintondirect.com/cdn/shop/files/SH970ACEC-5_900x.jpg?v=1686501226', status: 'in-stock' },
+            { id: 'SP027', name: 'Taro TR024-1', category: 'badminton', brand: 'Taro', price: 1290000, oldPrice: 0, stock: 19, sold: 35, image: 'https://cdn.shopvnb.com/uploads/gallery/giay-cau-long-taro-tr024-1-den-vang_1723141701.webp', status: 'low-stock' },
+
+            // Giày đi bộ (4 sản phẩm)
+            { id: 'SP019', name: 'New Balance Fresh Foam X 1080', category: 'walking', brand: 'New Balance', price: 1150000, oldPrice: 1350000, stock: 30, sold: 52, image: 'https://www.runningshoesguru.com/wp-content/uploads/2022/09/New-Balance-Fresh-Foam-X-1080-v12-14.jpeg', status: 'in-stock' },
+            { id: 'SP020', name: 'Skechers Go Walk', category: 'walking', brand: 'Skechers', price: 980000, oldPrice: 0, stock: 35, sold: 67, image: 'https://www.skechers.in/on/demandware.static/-/Sites-skechers_india/default/dwb14bb1e2/images/large/216275-1.jpg', status: 'in-stock' },
+            { id: 'SP021', name: 'Adidas Terrex Swift R4', category: 'walking', brand: 'Adidas', price: 1120000, oldPrice: 0, stock: 27, sold: 41, image: 'https://assets.adidas.com/images/h_840,f_auto,q_auto,fl_lossy,c_fill,g_auto/cbe301e2c23440afb067b76516315a47_9366/Supernova_Ease_Shoes_White_IF9563_01_00_standard.jpg', status: 'in-stock' },
+            { id: 'SP028', name: 'Nike Pegasus Trail 4', category: 'walking', brand: 'Nike', price: 1180000, oldPrice: 0, stock: 21, sold: 38, image: 'https://th.bing.com/th/id/OIP.lIowQIF-lznoVXaNE3T2BAHaFB?o=7rm=3&rs=1&pid=ImgDetMain&o=7&rm=3', status: 'in-stock' }
+        ];
+
+        // Cập nhật status cho sản phẩm dựa vào stock
+        function updateAllProductStatus() {
+            products.forEach(p => {
+                if (p.stock === 0) p.status = 'out-of-stock';
+                else if (p.stock < 20) p.status = 'low-stock';
+                else p.status = 'in-stock';
+            });
+        }
+        updateAllProductStatus();
+
+        // DỮ LIỆU ĐƠN HÀNG
+        let orders = [
+            { id: 'ORD001', customer: 'Nguyễn Văn An', userId: 2, date: '2026-04-01', product: 'Nike Air Zoom Pegasus 40', quantity: 1, total: 1290000, status: 'completed', payment: 'COD' },
+            { id: 'ORD002', customer: 'Trần Thị Bình', userId: 3, date: '2026-04-02', product: 'Adidas Supernova Ease', quantity: 1, total: 1390000, status: 'completed', payment: 'Banking' },
+            { id: 'ORD003', customer: 'Lê Hoàng Cường', userId: 4, date: '2026-04-03', product: 'Nike LeBron XX', quantity: 1, total: 1490000, status: 'processing', payment: 'Credit Card' },
+            { id: 'ORD004', customer: 'Phạm Thị Dung', userId: 5, date: '2026-04-04', product: 'Skechers Go Walk 6', quantity: 1, total: 1150000, status: 'pending', payment: 'COD' },
+            { id: 'ORD005', customer: 'Hoàng Văn Em', userId: 6, date: '2026-04-05', product: 'Puma Velocity Nitro 2', quantity: 1, total: 1380000, status: 'completed', payment: 'Banking' }
+        ];
+
+        // DỮ LIỆU NGƯỜI DÙNG
+        let users = [
+            { id: 1, username: 'admin', name: 'Admin', email: 'admin@sneakerstore.com', phone: '0901234567', role: 'admin', avatar: 'https://i.pravatar.cc/150?u=1', joinDate: '01/01/2026', status: 'active', totalOrders: 0, totalSpent: 0 },
+            { id: 2, username: 'nguyenvana', name: 'Nguyễn Văn An', email: 'nguyenvana@email.com', phone: '0912345678', role: 'user', avatar: 'https://i.pravatar.cc/150?u=2', joinDate: '15/01/2026', status: 'active', totalOrders: 2, totalSpent: 2680000 },
+            { id: 3, username: 'tranthib', name: 'Trần Thị Bình', email: 'tranthib@email.com', phone: '0923456789', role: 'user', avatar: 'https://i.pravatar.cc/150?u=3', joinDate: '18/01/2026', status: 'active', totalOrders: 1, totalSpent: 1390000 }
+        ];
+
+        // BIẾN TOÀN CỤC
+        let inventoryChart, revenueChart, topProductsChart, orderStatusChart, categoryRevenueChart, growthChart;
+        let currentReportData = null, currentReportType = null;
+        let currentCategory = 'all', currentPeriod = 'month';
+        let autoRefreshInterval = null;
+
+        // ===== HÀM CẬP NHẬT THỜI GIAN =====
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('currentDateTime').textContent = now.toLocaleString('vi-VN');
+        }
+
+        function updateLastUpdateTime() {
+            const now = new Date();
+            document.getElementById('lastUpdateTime').innerHTML = `<i class="far fa-clock"></i> Cập nhật lúc: ${now.toLocaleTimeString('vi-VN')}`;
+        }
+
+        // ===== LƯU VÀO LOCALSTORAGE =====
+        function saveToLocalStorage() {
+            localStorage.setItem('products', JSON.stringify(products));
+            localStorage.setItem('orders', JSON.stringify(orders));
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        function loadFromLocalStorage() {
+            const storedProducts = localStorage.getItem('products');
+            const storedOrders = localStorage.getItem('orders');
+            const storedUsers = localStorage.getItem('users');
+
+            if (storedProducts) products = JSON.parse(storedProducts);
+            if (storedOrders) orders = JSON.parse(storedOrders);
+            if (storedUsers) users = JSON.parse(storedUsers);
+            else saveToLocalStorage();
+        }
+
+        // ===== CẬP NHẬT TOÀN BỘ DASHBOARD =====
+        function updateDashboard() {
+            const totalProducts = products.length;
+            const totalStock = products.reduce((sum, p) => sum + p.stock, 0);
+            const totalOrders = orders.length;
+            const totalUsers = users.length;
+            const totalRevenue = orders.reduce((sum, o) => sum + (o.status === 'completed' ? o.total : 0), 0);
+
+            document.getElementById('totalProducts').textContent = totalProducts;
+            document.getElementById('totalInventory').textContent = totalStock;
+            document.getElementById('totalOrders').textContent = totalOrders;
+            document.getElementById('totalUsers').textContent = totalUsers;
+            document.getElementById('totalRevenue').textContent = formatPrice(totalRevenue);
+
+            // Đơn hàng gần đây
+            const recentOrders = [...orders].slice(-5).reverse();
+            let recentHtml = '';
+            recentOrders.forEach(order => {
+                recentHtml += `<tr><td>${order.id}</td><td>${order.customer}</td><td>${order.product}</td><td>${formatPrice(order.total)}</td><td><span class="status-badge ${order.status}">${getStatusText(order.status)}</span></td></tr>`;
+            });
+            document.getElementById('recentOrdersTable').innerHTML = recentHtml || '<tr><td colspan="5" style="text-align: center;">Chưa có đơn hàng</td></tr>';
+
+            updateCharts();
+            updateLastUpdateTime();
+        }
+
+        // ===== CẬP NHẬT BIỂU ĐỒ =====
+        function updateCharts() {
+            // Tồn kho theo danh mục
+            const categoryStock = { running: 0, training: 0, basketball: 0, football: 0, tennis: 0, badminton: 0, walking: 0 };
+            products.forEach(p => { categoryStock[p.category] = (categoryStock[p.category] || 0) + p.stock; });
+
+            if (inventoryChart) inventoryChart.destroy();
+            inventoryChart = new Chart(document.getElementById('inventoryChart'), {
+                type: 'pie', data: { labels: ['Chạy bộ', 'Tập luyện', 'Bóng rổ', 'Bóng đá', 'Tennis', 'Cầu lông', 'Đi bộ'], datasets: [{ data: Object.values(categoryStock), backgroundColor: ['#667eea', '#764ba2', '#ffd700', '#28a745', '#dc3545', '#17a2b8', '#fd7e14'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+
+            // Doanh thu 7 ngày
+            const last7Days = [], revenue7Days = [];
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date(); date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                last7Days.push(date.getDate() + '/' + (date.getMonth() + 1));
+                const dayRevenue = orders.filter(o => o.date === dateStr && o.status === 'completed').reduce((s, o) => s + o.total, 0);
+                revenue7Days.push(dayRevenue / 1000000);
+            }
+            if (revenueChart) revenueChart.destroy();
+            revenueChart = new Chart(document.getElementById('revenueChart'), {
+                type: 'line', data: { labels: last7Days, datasets: [{ label: 'Doanh thu (triệu đồng)', data: revenue7Days, borderColor: '#764ba2', backgroundColor: 'rgba(118,75,162,0.1)', tension: 0.4, fill: true }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            // Top 5 sản phẩm bán chạy
+            const topProductsList = [...products].sort((a, b) => b.sold - a.sold).slice(0, 5);
+            if (topProductsChart) topProductsChart.destroy();
+            topProductsChart = new Chart(document.getElementById('topProductsChart'), {
+                type: 'bar', data: { labels: topProductsList.map(p => p.name.length > 20 ? p.name.substring(0, 20) + '...' : p.name), datasets: [{ label: 'Đã bán', data: topProductsList.map(p => p.sold), backgroundColor: '#667eea', borderRadius: 5 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            // Trạng thái đơn hàng
+            const statusCount = { pending: orders.filter(o => o.status === 'pending').length, processing: orders.filter(o => o.status === 'processing').length, completed: orders.filter(o => o.status === 'completed').length, cancelled: orders.filter(o => o.status === 'cancelled').length };
+            if (orderStatusChart) orderStatusChart.destroy();
+            orderStatusChart = new Chart(document.getElementById('orderStatusChart'), {
+                type: 'doughnut', data: { labels: ['Chờ xử lý', 'Đang xử lý', 'Hoàn thành', 'Đã hủy'], datasets: [{ data: Object.values(statusCount), backgroundColor: ['#ffc107', '#17a2b8', '#28a745', '#dc3545'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+        }
+
+        // ===== LOAD BẢNG =====
+        function loadInventoryTable() {
+            let html = '';
+            products.forEach(p => {
+                html += `<tr><td>${p.id}</td><td><img src="${p.image}" style="width:50px;height:50px;object-fit:cover;border-radius:5px;" onerror="this.src='https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400'" onerror="this.src='https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400'"></td><td><a href="product-detail.html?id=${p.id}" target="_blank" style="color: #764ba2; text-decoration: none;">${p.name}</a></td><td>${getCategoryName(p.category)}</td><td>${p.brand}</td><td>${formatPrice(p.price)}</td><td>${p.stock}</td><td>${p.sold}</td><td><span class="status-badge ${p.status}">${getStockStatus(p.status)}</span></td><td><button class="action-btn" onclick="window.open('product-detail.html?id=${p.id}', '_blank')" title="Xem sản phẩm"><i class="fas fa-eye"></i></button><button class="action-btn" onclick="editProduct('${p.id}')"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn" onclick="deleteProduct('${p.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
+            });
+            document.getElementById('inventoryTable').innerHTML = html || '<tr><td colspan="10" style="text-align: center;">Chưa có sản phẩm</td></tr>';
+        }
+
+        function loadProductsTable() {
+            let html = '';
+            products.forEach(p => {
+                html += `<tr><td>${p.id}</td><td><img src="${p.image}" style="width:50px;height:50px;object-fit:cover;border-radius:5px;"></td><td>${p.name}</td><td>${getCategoryName(p.category)}</td><td>${p.brand}</td><td>${formatPrice(p.price)}</td><td>${p.stock}</td><td>${p.sold}</td><td><span class="status-badge ${p.status}">${getStockStatus(p.status)}</span></td><td><button class="action-btn" onclick="window.open('product-detail.html?id=${p.id}', '_blank')" title="Xem sản phẩm"><i class="fas fa-eye"></i></button><button class="action-btn" onclick="editProduct('${p.id}')"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn" onclick="deleteProduct('${p.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
+            });
+            document.getElementById('productsTable').innerHTML = html || '<tr><td colspan="10" style="text-align: center;">Chưa có sản phẩm</td></tr>';
+        }
+
+        function loadOrdersTable() {
+            let html = '';
+            [...orders].reverse().forEach(o => {
+                html += `<tr><td><strong>${o.id}</strong></td><td>${o.customer}</td><td>${o.date}</td><td>${o.product} x${o.quantity}</td><td>${formatPrice(o.total)}</td><td><span class="status-badge ${o.status}" style="padding:0.3rem 1rem;">${getStatusText(o.status)}</span></td><td>${o.payment || 'COD'}</td><td><button class="action-btn" onclick="viewOrderDetail('${o.id}')"><i class="fas fa-eye"></i></button><button class="action-btn" onclick="updateOrderStatus('${o.id}')"><i class="fas fa-edit"></i></button></td></tr>`;
+            });
+            document.getElementById('ordersTable').innerHTML = html || '<tr><td colspan="8" style="text-align: center;">Chưa có đơn hàng</td></tr>';
+        }
+
+        function loadUsersTable() {
+            let html = '';
+            users.forEach(u => {
+                let statusClass = u.status === 'active' ? 'in-stock' : (u.status === 'inactive' ? 'out-of-stock' : 'low-stock');
+                let statusText = u.status === 'active' ? 'Hoạt động' : (u.status === 'inactive' ? 'Không hoạt động' : 'Chờ xác thực');
+                html += `<tr><td>${u.id}</td><td><img src="${u.avatar}" style="width:40px;height:40px;border-radius:50%;"></td><td><strong>${u.name}</strong><br><small>@${u.username}</small></td><td>${u.email}</td><td>${u.phone}</td><td><span class="status-badge" style="background:${u.role === 'admin' ? '#764ba2' : '#28a745'};color:white;">${u.role === 'admin' ? 'Admin' : 'User'}</span></td><td><span class="status-badge ${statusClass}">${statusText}</span></td><td>${u.joinDate}</td><td><small>${u.totalOrders} đơn</small><br><small>${formatPrice(u.totalSpent)}</small></td><td><button class="action-btn" onclick="viewUserOrders(${u.id})"><i class="fas fa-shopping-cart"></i></button><button class="action-btn" onclick="editUser(${u.id})"><i class="fas fa-edit"></i></button>${u.role !== 'admin' ? '<button class="action-btn delete-btn" onclick="deleteUser(' + u.id + ')"><i class="fas fa-trash"></i></button>' : ''}</td></tr>`;
+            });
+            document.getElementById('usersTable').innerHTML = html || '<tr><td colspan="10" style="text-align: center;">Chưa có người dùng</td></tr>';
+        }
+
+        // ===== CÁC HÀM TIỆN ÍCH =====
+        function formatPrice(price) { return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + 'đ'; }
+        function getCategoryName(cat) { const map = { 'running': '🏃 Chạy bộ', 'training': '🏋️ Tập luyện', 'basketball': '🏀 Bóng rổ', 'football': '⚽ Bóng đá', 'tennis': '🎾 Tennis', 'badminton': '🏸 Cầu lông', 'walking': '🚶 Đi bộ' }; return map[cat] || cat; }
+        function getStockStatus(status) { const map = { 'in-stock': 'Còn hàng', 'low-stock': 'Gần hết', 'out-of-stock': 'Hết hàng' }; return map[status] || status; }
+        function getStatusText(status) { const map = { 'pending': 'Chờ xử lý', 'processing': 'Đang xử lý', 'completed': 'Hoàn thành', 'cancelled': 'Đã hủy' }; return map[status] || status; }
+        function showNotification(msg, type = 'success') { const n = document.createElement('div'); n.className = `toast-notification ${type}`; n.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i> ${msg}`; document.body.appendChild(n); setTimeout(() => n.remove(), 3000); }
+
+        // ===== QUẢN LÝ SẢN PHẨM =====
+        function openAddProductModal() { document.getElementById('addProductModal').classList.add('show'); document.getElementById('imagePreview').innerHTML = '<i class="fas fa-cloud-upload-alt"></i>'; }
+        function closeModal() { document.getElementById('addProductModal').classList.remove('show'); }
+        function closeEditModal() { document.getElementById('editProductModal').classList.remove('show'); }
+        function previewImage(url) { const preview = document.getElementById('imagePreview'); if (url) preview.innerHTML = `<img src="${url}" onerror="this.parentElement.innerHTML='<i class=\'fas fa-exclamation-triangle\'></i>';">`; else preview.innerHTML = '<i class="fas fa-cloud-upload-alt"></i>'; }
+        function previewEditImage(url) { const preview = document.getElementById('editImagePreview'); if (url) preview.innerHTML = `<img src="${url}" onerror="this.parentElement.innerHTML='<i class=\'fas fa-exclamation-triangle\'></i>';">`; else preview.innerHTML = '<i class="fas fa-cloud-upload-alt"></i>'; }
+
+        function saveProduct() {
+            const newProduct = {
+                id: document.getElementById('productCode').value,
+                name: document.getElementById('productName').value,
+                category: document.getElementById('productCategorySelect').value,
+                brand: document.getElementById('productBrand').value,
+                price: parseInt(document.getElementById('productPrice').value),
+                stock: parseInt(document.getElementById('productStock').value),
+                sold: parseInt(document.getElementById('productSold').value) || 0,
+                image: document.getElementById('productImage').value || 'https://via.placeholder.com/200',
+                description: document.getElementById('productDescription').value
+            };
+            if (!newProduct.id || !newProduct.name || !newProduct.category || !newProduct.brand || !newProduct.price) { showNotification('Vui lòng điền đầy đủ thông tin!', 'error'); return; }
+            if (products.some(p => p.id === newProduct.id)) { showNotification('Mã sản phẩm đã tồn tại!', 'error'); return; }
+            if (newProduct.stock === 0) newProduct.status = 'out-of-stock';
+            else if (newProduct.stock < 20) newProduct.status = 'low-stock';
+            else newProduct.status = 'in-stock';
+            products.push(newProduct);
+            saveToLocalStorage();
+            updateDashboard(); loadInventoryTable(); loadProductsTable();
+            closeModal();
+            showNotification('Thêm sản phẩm thành công!');
+        }
+
+        function editProduct(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            document.getElementById('editProductId').value = product.id;
+            document.getElementById('editProductName').value = product.name;
+            document.getElementById('editProductCategory').value = product.category;
+            document.getElementById('editProductBrand').value = product.brand;
+            document.getElementById('editProductCode').value = product.id;
+            document.getElementById('editProductPrice').value = product.price;
+            document.getElementById('editProductStock').value = product.stock;
+            document.getElementById('editProductSold').value = product.sold;
+            document.getElementById('editProductDescription').value = product.description || '';
+            document.getElementById('editProductImage').value = product.image;
+            document.getElementById('editImagePreview').innerHTML = `<img src="${product.image}" onerror="this.src='https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400'">`;
+            document.getElementById('editProductModal').classList.add('show');
+        }
+
+        function updateProduct() {
+            const id = document.getElementById('editProductId').value;
+            const index = products.findIndex(p => p.id === id);
+            if (index === -1) return;
+            const newCode = document.getElementById('editProductCode').value;
+            if (newCode !== id && products.some(p => p.id === newCode)) { showNotification('Mã sản phẩm đã tồn tại!', 'error'); return; }
+            const stock = parseInt(document.getElementById('editProductStock').value);
+            let status = 'out-of-stock';
+            if (stock === 0) status = 'out-of-stock';
+            else if (stock < 20) status = 'low-stock';
+            else status = 'in-stock';
+            products[index] = { ...products[index], id: newCode, name: document.getElementById('editProductName').value, category: document.getElementById('editProductCategory').value, brand: document.getElementById('editProductBrand').value, price: parseInt(document.getElementById('editProductPrice').value), stock: stock, sold: parseInt(document.getElementById('editProductSold').value), image: document.getElementById('editProductImage').value || products[index].image, description: document.getElementById('editProductDescription').value, status: status };
+            saveToLocalStorage();
+            updateDashboard(); loadInventoryTable(); loadProductsTable();
+            closeEditModal();
+            showNotification('Cập nhật sản phẩm thành công!');
+        }
+
+        function deleteProduct(productId) {
+            if (confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
+                products = products.filter(p => p.id !== productId);
+                saveToLocalStorage();
+                updateDashboard(); loadInventoryTable(); loadProductsTable();
+                showNotification('Xóa sản phẩm thành công!');
+            }
+        }
+
+        // ===== THỐNG KÊ REAL-TIME =====
+
+        function updateStatistics() {
+            const periodStart = getPeriodStart(currentPeriod);
+
+            // Lọc orders theo period và category
+            let filteredOrders = orders.filter(order => {
+                const orderDate = new Date(order.date);
+                return orderDate >= periodStart && (currentCategory === 'all' || order.category === currentCategory);
+            });
+
+            // Tính toán thống kê
+            const totalOrders = filteredOrders.length;
+            const totalRevenue = filteredOrders.reduce((sum, o) => sum + (o.status === 'completed' ? o.total : 0), 0);
+            const totalProfit = totalRevenue * 0.3; // Giả sử lợi nhuận 30%
+
+            // Lọc products theo category
+            let filteredProducts = currentCategory === 'all' ? products : products.filter(p => p.category === currentCategory);
+            const totalProducts = filteredProducts.length;
+
+            // Cập nhật UI
+            document.getElementById('statOrders').textContent = totalOrders;
+            document.getElementById('statRevenue').textContent = formatPrice(totalRevenue);
+            document.getElementById('statProfit').textContent = formatPrice(totalProfit);
+            document.getElementById('statProducts').textContent = totalProducts;
+
+            // Cập nhật percentage changes
+            updatePercentageChanges(currentPeriod, currentCategory);
+
+            // Cập nhật charts
+            updateStatisticsCharts(filteredOrders, filteredProducts);
+
+            // Cập nhật category stats
+            updateCategoryStats(filteredOrders, filteredProducts);
+        }
+
+        function changePeriod(period, button) {
+            currentPeriod = period;
+            document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            updateStatistics();
+        }
+
+        function filterByCategory() {
+            currentCategory = document.getElementById('statCategoryFilter').value;
+            document.getElementById('selectedCategoryName').textContent = getCategoryName(currentCategory);
+            updateStatistics();
+        }
+
+        // ===== CHỨC NĂNG KHÁC =====
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.sidebar-nav li').forEach(l => l.classList.remove('active'));
+            event.target.closest('li').classList.add('active');
+
+            // Update statistics when statistics section is shown
+            if (sectionId === 'statistics') {
+                updateStatistics();
+            }
+        }
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.sidebar-nav li').forEach(l => l.classList.remove('active'));
+            event.target.closest('li').classList.add('active');
+            const titles = { 'dashboard': 'Tổng quan', 'inventory': 'Hàng tồn kho', 'statistics': 'Thống kê', 'orders': 'Đơn hàng', 'users': 'Người dùng', 'products': 'Sản phẩm' };
+            document.getElementById('pageTitle').textContent = titles[sectionId];
+            if (sectionId === 'statistics') updateStatistics();
+        }
+
+        function updateStatistics() {
+            const now = new Date();
+            const periodStart = getPeriodStart(currentPeriod);
+
+            // Lọc orders theo period và category
+            let filteredOrders = orders.filter(order => {
+                const orderDate = new Date(order.date);
+                return orderDate >= periodStart && (currentCategory === 'all' || order.category === currentCategory);
+            });
+
+            // Tính toán thống kê
+            const totalOrders = filteredOrders.length;
+            const totalRevenue = filteredOrders.reduce((sum, o) => sum + (o.status === 'completed' ? o.total : 0), 0);
+            const totalProfit = totalRevenue * 0.3; // Giả sử lợi nhuận 30%
+
+            // Lọc products theo category
+            let filteredProducts = currentCategory === 'all' ? products : products.filter(p => p.category === currentCategory);
+            const totalProducts = filteredProducts.length;
+
+            // Cập nhật UI
+            document.getElementById('statOrders').textContent = totalOrders;
+            document.getElementById('statRevenue').textContent = formatPrice(totalRevenue);
+            document.getElementById('statProfit').textContent = formatPrice(totalProfit);
+            document.getElementById('statProducts').textContent = totalProducts;
+
+            // Cập nhật changes (so với period trước)
+            updateStatChanges(currentPeriod, currentCategory);
+
+            // Cập nhật charts
+            updateStatisticsCharts(filteredOrders, filteredProducts);
+
+            // Cập nhật category stats
+            updateCategoryStats();
+
+            // Cập nhật category products table
+            updateCategoryProductsTable(filteredProducts);
+
+            document.getElementById('selectedCategoryName').textContent = getCategoryName(currentCategory);
+        }
+
+        function getPeriodStart(period) {
+            const now = new Date();
+            switch (period) {
+                case 'day': return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                case 'week': return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                case 'month': return new Date(now.getFullYear(), now.getMonth(), 1);
+                case 'year': return new Date(now.getFullYear(), 0, 1);
+                default: return new Date(now.getTime() - 24 * 60 * 60 * 1000);
+            }
+        }
+
+        function updateStatChanges(period, category) {
+            const now = new Date();
+            const currentStart = getPeriodStart(period);
+            const previousStart = new Date(currentStart.getTime() - (currentStart - getPeriodStart(period === 'day' ? 'day' : period === 'week' ? 'week' : period === 'month' ? 'month' : 'year')));
+
+            let currentFiltered = orders.filter(o => new Date(o.date) >= currentStart && (category === 'all' || o.category === category));
+            let previousFiltered = orders.filter(o => new Date(o.date) >= previousStart && new Date(o.date) < currentStart && (category === 'all' || o.category === category));
+
+            const currentRevenue = currentFiltered.reduce((sum, o) => sum + (o.status === 'completed' ? o.total : 0), 0);
+            const previousRevenue = previousFiltered.reduce((sum, o) => sum + (o.status === 'completed' ? o.total : 0), 0);
+
+            const revenueChange = previousRevenue > 0 ? ((currentRevenue - previousRevenue) / previousRevenue * 100).toFixed(1) : 0;
+            const orderChange = previousFiltered.length > 0 ? ((currentFiltered.length - previousFiltered.length) / previousFiltered.length * 100).toFixed(1) : 0;
+
+            document.getElementById('revenueChange').textContent = (revenueChange >= 0 ? '+' : '') + revenueChange + '%';
+            document.getElementById('revenueChange').className = 'stat-change ' + (revenueChange >= 0 ? 'positive' : 'negative');
+
+            document.getElementById('orderChange').textContent = (orderChange >= 0 ? '+' : '') + orderChange + '%';
+            document.getElementById('orderChange').className = 'stat-change ' + (orderChange >= 0 ? 'positive' : 'negative');
+        }
+
+        function updateStatisticsCharts(filteredOrders, filteredProducts) {
+            // Category Revenue Chart
+            const categoryRevenue = {};
+            filteredOrders.forEach(order => {
+                if (order.status === 'completed') {
+                    categoryRevenue[order.category] = (categoryRevenue[order.category] || 0) + order.total;
+                }
+            });
+
+            const ctx1 = document.getElementById('categoryRevenueChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(categoryRevenue).map(cat => getCategoryName(cat)),
+                    datasets: [{
+                        data: Object.values(categoryRevenue),
+                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            // Growth Chart (doanh thu theo thời gian)
+            const growthData = {};
+            filteredOrders.forEach(order => {
+                if (order.status === 'completed') {
+                    const date = new Date(order.date).toLocaleDateString('vi-VN');
+                    growthData[date] = (growthData[date] || 0) + order.total;
+                }
+            });
+
+            const ctx2 = document.getElementById('growthChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: Object.keys(growthData),
+                    datasets: [{
+                        label: 'Doanh thu',
+                        data: Object.values(growthData),
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function (value) {
+                                    return formatPrice(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateCategoryStats() {
+            const stats = {};
+            products.forEach(product => {
+                if (!stats[product.category]) {
+                    stats[product.category] = { count: 0, revenue: 0, sold: 0 };
+                }
+                stats[product.category].count++;
+                stats[product.category].revenue += product.price * product.sold;
+                stats[product.category].sold += product.sold;
+            });
+
+            let html = '';
+            Object.keys(stats).forEach(category => {
+                const stat = stats[category];
+                html += `
+                    <div class="category-stat-item">
+                        <h4>${getCategoryName(category)}</h4>
+                        <div class="stat-metrics">
+                            <div class="metric"><span class="metric-value">${stat.count}</span><span class="metric-label">Sản phẩm</span></div>
+                            <div class="metric"><span class="metric-value">${formatPrice(stat.revenue)}</span><span class="metric-label">Doanh thu</span></div>
+                            <div class="metric"><span class="metric-value">${stat.sold}</span><span class="metric-label">Đã bán</span></div>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('categoryStats').innerHTML = html;
+        }
+
+        function updateCategoryProductsTable(filteredProducts) {
+            let html = '';
+            filteredProducts.forEach(product => {
+                html += `
+                    <tr>
+                        <td>${product.id}</td>
+                        <td><a href="product-detail.html?id=${product.id}" target="_blank" style="color: #764ba2; text-decoration: none;">${product.name}</a></td>
+                        <td>${product.brand}</td>
+                        <td>${formatPrice(product.price)}</td>
+                        <td>${product.sold}</td>
+                        <td>${formatPrice(product.price * product.sold)}</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('categoryProductsTable').innerHTML = html || '<tr><td colspan="6" style="text-align: center;">Không có sản phẩm</td></tr>';
+        }
+
+        function getCategoryName(category) {
+            const names = {
+                'running': '🏃 Giày chạy bộ',
+                'training': '🏋️ Giày tập luyện',
+                'basketball': '🏀 Giày bóng rổ',
+                'football': '⚽ Giày bóng đá',
+                'tennis': '🎾 Giày tennis',
+                'badminton': '🏸 Giày cầu lông',
+                'walking': '🚶 Giày đi bộ',
+                'all': 'Tất cả danh mục'
+            };
+            return names[category] || category;
+        }
+
+        function filterByCategory() {
+            currentCategory = document.getElementById('statCategoryFilter').value;
+            updateStatistics();
+        }
+
+        function changePeriod(period, el) {
+            currentPeriod = period;
+            document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+            el.classList.add('active');
+            updateStatistics();
+        }
+        function viewInventoryReport() { alert('Xem báo cáo tồn kho'); }
+        function viewOrdersReport() { alert('Xem báo cáo đơn hàng'); }
+        function viewUsersReport() { alert('Xem báo cáo người dùng'); }
+        function viewRevenueReport() { alert('Xem báo cáo doanh thu'); }
+        function viewCategoryReport() { alert('Xem báo cáo danh mục'); }
+        function viewOrderDetail(id) { alert('Chi tiết đơn hàng: ' + id); }
+        function updateOrderStatus(id) { alert('Cập nhật trạng thái: ' + id); }
+        function viewUserOrders(id) { alert('Xem đơn hàng user: ' + id); }
+        function editUser(id) { alert('Sửa user: ' + id); }
+        function deleteUser(id) { if (confirm('Xóa user?')) { users = users.filter(u => u.id !== id); saveToLocalStorage(); loadUsersTable(); showNotification('Đã xóa user!'); } }
+        function exportInventory() { showNotification('Đang xuất báo cáo...'); }
+        function exportCurrentReportToExcel() { showNotification('Đang xuất Excel...'); }
+        function exportCurrentReportToPDF() { showNotification('Đang xuất PDF...'); }
+        function printReport() { window.print(); }
+        function closeReportModal() { document.getElementById('reportModal').classList.remove('show'); }
+
+        function loadAdminInfo() {
+            const admin = JSON.parse(sessionStorage.getItem('currentUser')) || JSON.parse(localStorage.getItem('rememberedUser'));
+            if (!admin) return;
+            document.getElementById('adminInfo').innerHTML = `<img src="${admin.avatar}" class="admin-avatar"><div class="admin-details"><h4>${admin.name}</h4><p>Quản trị viên</p></div>`;
+        }
+
+        function logout() { if (confirm('Đăng xuất?')) { sessionStorage.removeItem('currentUser'); localStorage.removeItem('rememberedUser'); window.location.href = 'index.html'; } }
+
+        // ===== AUTO REFRESH REAL-TIME =====
+        function startAutoRefresh() {
+            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+            autoRefreshInterval = setInterval(() => {
+                loadFromLocalStorage();
+                updateDashboard();
+                loadInventoryTable();
+                loadProductsTable();
+                loadOrdersTable();
+                loadUsersTable();
+                if (document.getElementById('statistics').classList.contains('active')) {
+                    updateStatistics();
+                }
+                console.log('🔄 Auto refresh at:', new Date().toLocaleTimeString());
+            }, 10000);
+        }
+
+        // ===== HELPER FUNCTIONS =====
+        function getPeriodStart(period) {
+            const now = new Date();
+            const start = new Date(now);
+
+            switch (period) {
+                case 'day':
+                    start.setHours(0, 0, 0, 0);
+                    break;
+                case 'week':
+                    start.setDate(now.getDate() - now.getDay());
+                    start.setHours(0, 0, 0, 0);
+                    break;
+                case 'month':
+                    start.setDate(1);
+                    start.setHours(0, 0, 0, 0);
+                    break;
+                case 'year':
+                    start.setMonth(0, 1);
+                    start.setHours(0, 0, 0, 0);
+                    break;
+            }
+            return start;
+        }
+
+        function updatePercentageChanges(period, category) {
+            const currentStart = getPeriodStart(period);
+            const previousStart = new Date(currentStart.getTime() - (currentStart - getPeriodStart(period === 'day' ? 'day' : period === 'week' ? 'week' : period === 'month' ? 'month' : 'year')));
+
+            let currentFiltered = orders.filter(o => new Date(o.date) >= currentStart && (category === 'all' || o.category === category));
+            let previousFiltered = orders.filter(o => new Date(o.date) >= previousStart && new Date(o.date) < currentStart && (category === 'all' || o.category === category));
+
+            const currentRevenue = currentFiltered.reduce((sum, o) => sum + (o.status === 'completed' ? o.total : 0), 0);
+            const previousRevenue = previousFiltered.reduce((sum, o) => sum + (o.status === 'completed' ? o.total : 0), 0);
+
+            const revenueChange = previousRevenue > 0 ? ((currentRevenue - previousRevenue) / previousRevenue * 100).toFixed(1) : 0;
+            const orderChange = previousFiltered.length > 0 ? ((currentFiltered.length - previousFiltered.length) / previousFiltered.length * 100).toFixed(1) : 0;
+
+            document.getElementById('revenueChange').textContent = (revenueChange >= 0 ? '+' : '') + revenueChange + '%';
+            document.getElementById('revenueChange').className = 'stat-change ' + (revenueChange >= 0 ? 'positive' : 'negative');
+
+            document.getElementById('orderChange').textContent = (orderChange >= 0 ? '+' : '') + orderChange + '%';
+            document.getElementById('orderChange').className = 'stat-change ' + (orderChange >= 0 ? 'positive' : 'negative');
+        }
+
+        // ===== KHỞI TẠO =====
+        document.addEventListener('DOMContentLoaded', function () {
+            loadFromLocalStorage();
+            loadAdminInfo();
+            updateDashboard();
+            loadInventoryTable();
+            loadProductsTable();
+            loadOrdersTable();
+            loadUsersTable();
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            startAutoRefresh();
+        });
+    </script>
+    <script src="js/utils.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,97 @@
+/* Layout chia 2 cột */
+.shop-container {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 30px;
+    padding: 40px 0;
+}
+
+/* Sidebar phong cách của bạn */
+.sidebar-filter {
+    padding: 10px;
+}
+
+.filter-title {
+    font-size: 1.1rem;
+    color: #333;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #764ba2; /* Màu tím của bạn */
+}
+
+.category-list {
+    list-style: none;
+}
+
+.category-list li {
+    padding: 10px 0;
+    cursor: pointer;
+    transition: 0.3s;
+    color: #666;
+}
+
+.category-list li:hover, 
+.category-list li.active {
+    color: #764ba2;
+    font-weight: bold;
+    padding-left: 5px;
+}
+
+/* Bộ lọc giá */
+.price-inputs {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 15px 0;
+}
+
+.price-inputs input {
+    width: 80px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.btn-apply-filter {
+    width: 100%;
+    padding: 8px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Thanh sắp xếp */
+.sort-bar {
+    background: #f0f0f0;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+}
+
+.sort-btn {
+    padding: 8px 18px;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+.sort-btn.active {
+    background: #764ba2;
+    color: white;
+    border-color: #764ba2;
+}
+
+/* Giữ nguyên Grid sản phẩm của bạn nhưng chỉnh lại số cột */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 cột khi có sidebar */
+    gap: 20px;
+}

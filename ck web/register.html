@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký - SneakerStore</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .register-container {
+            width: 550px;
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .register-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .register-header .logo {
+            font-size: 2rem;
+            color: #333;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .register-header .logo span {
+            color: #764ba2;
+        }
+        
+        .register-header h2 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .register-header p {
+            color: #666;
+        }
+        
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .form-group label i {
+            margin-right: 0.5rem;
+            color: #764ba2;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(118,75,162,0.1);
+        }
+        
+        .password-input {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .terms {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1.2rem 0;
+            color: #666;
+        }
+        
+        .terms a {
+            color: #764ba2;
+            text-decoration: none;
+        }
+        
+        .terms a:hover {
+            text-decoration: underline;
+        }
+        
+        .register-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .register-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+        }
+        
+        .error-message {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            display: none;
+            background: #ffe6e6;
+            padding: 0.8rem;
+            border-radius: 8px;
+        }
+        
+        .success-message {
+            color: #28a745;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            display: none;
+            background: #e6ffe6;
+            padding: 0.8rem;
+            border-radius: 8px;
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #666;
+        }
+        
+        .login-link a {
+            color: #764ba2;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .field-hint {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.3rem;
+        }
+        
+        .field-hint i {
+            color: #764ba2;
+            margin-right: 0.3rem;
+        }
+        
+        .save-note {
+            background: #e7f3ff;
+            border-left: 4px solid #764ba2;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #333;
+        }
+        
+        .save-note i {
+            color: #764ba2;
+            margin-right: 0.5rem;
+        }
+        
+        /* Modal xem danh sách */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            width: 800px;
+            max-width: 90%;
+            max-height: 80vh;
+            border-radius: 20px;
+            overflow: hidden;
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .user-table th {
+            background: #f8f9fa;
+            padding: 0.8rem;
+            text-align: left;
+            position: sticky;
+            top: 0;
+        }
+        
+        .user-table td {
+            padding: 0.8rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .user-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .view-list-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .view-list-btn:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <a href="index.html" class="logo">Sneaker<span>Store</span></a>
+            <h2>Đăng ký tài khoản</h2>
+            <p>Tham gia cùng SneakerStore để nhận nhiều ưu đãi</p>
+        </div>
+        
+        <div class="save-note">
+            <i class="fas fa-save"></i> Thông tin đăng ký sẽ được lưu vào <strong>LocalStorage</strong> trên trình duyệt
+        </div>
+        
+        <form id="registerForm">
+            <div class="form-group">
+                <label><i class="fas fa-user-circle"></i> Tên tài khoản</label>
+                <input type="text" id="username" placeholder="Nhập tên tài khoản" required>
+                <div class="field-hint">
+                    <i class="fas fa-info-circle"></i> Tên tài khoản từ 6-20 ký tự, chỉ gồm chữ, số và dấu gạch dưới (_)
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Họ</label>
+                    <input type="text" id="firstName" placeholder="Nhập họ" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Tên</label>
+                    <input type="text" id="lastName" placeholder="Nhập tên" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-envelope"></i> Email</label>
+                <input type="email" id="email" placeholder="Nhập email" required>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-phone"></i> Số điện thoại</label>
+                <input type="tel" id="phone" placeholder="Nhập số điện thoại" required>
+                <div class="field-hint">
+                    <i class="fas fa-info-circle"></i> Số điện thoại Việt Nam (10 số, bắt đầu bằng 03,05,07,08,09)
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-lock"></i> Mật khẩu</label>
+                <div class="password-input">
+                    <input type="password" id="password" placeholder="Nhập mật khẩu" required>
+                    <i class="fas fa-eye toggle-password" onclick="togglePassword('password')"></i>
+                </div>
+                <div class="field-hint">
+                    <i class="fas fa-info-circle"></i> Mật khẩu phải có ít nhất 6 ký tự
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-lock"></i> Xác nhận mật khẩu</label>
+                <div class="password-input">
+                    <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu" required>
+                    <i class="fas fa-eye toggle-password" onclick="togglePassword('confirmPassword')"></i>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-map-marker-alt"></i> Địa chỉ (tùy chọn)</label>
+                <input type="text" id="address" placeholder="Nhập địa chỉ">
+            </div>
+            
+            <div class="terms">
+                <input type="checkbox" id="terms" required>
+                <label for="terms">Tôi đồng ý với <a href="#">Điều khoản dịch vụ</a> và <a href="#">Chính sách bảo mật</a></label>
+            </div>
+            
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+            
+            <button type="submit" class="register-btn">
+                <i class="fas fa-user-plus"></i> Đăng ký
+            </button>
+        </form>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+            <div class="login-link">
+                Đã có tài khoản? <a href="login.html">Đăng nhập ngay</a>
+            </div>
+            <button class="view-list-btn" onclick="showUserList()">
+                <i class="fas fa-list"></i> Xem danh sách đã đăng ký
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL HIỂN THỊ DANH SÁCH NGƯỜI DÙNG -->
+    <div class="modal" id="userListModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-users"></i> Danh sách người dùng đã đăng ký</h2>
+                <button class="close-btn" onclick="closeUserList()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="userListBody">
+                <!-- Nội dung sẽ được load bằng JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ===== LẤY DANH SÁCH NGƯỜI DÙNG TỪ LOCALSTORAGE =====
+        function getUsers() {
+            const storedUsers = localStorage.getItem('users');
+            if (storedUsers) {
+                return JSON.parse(storedUsers);
+            } else {
+                // Users mặc định
+                const defaultUsers = [
+                    { id: 1, username: 'admin', password: 'admin123', role: 'admin', name: 'Admin', email: 'admin@sneakerstore.com', phone: '0901234567', address: 'Hà Nội', avatar: 'https://i.pravatar.cc/150?u=1' },
+                    { id: 2, username: 'user1', password: 'user123', role: 'user', name: 'Nguyễn Văn A', email: 'nguyenvana@email.com', phone: '0912345678', address: 'Hà Nội', avatar: 'https://i.pravatar.cc/150?u=2' },
+                    { id: 3, username: 'user2', password: 'user123', role: 'user', name: 'Trần Thị B', email: 'tranthib@email.com', phone: '0923456789', address: 'Đà Nẵng', avatar: 'https://i.pravatar.cc/150?u=3' }
+                ];
+                localStorage.setItem('users', JSON.stringify(defaultUsers));
+                return defaultUsers;
+            }
+        }
+
+        // ===== LẤY DANH SÁCH ĐÃ LƯU (REGISTER LOG) =====
+        function getRegisteredUsers() {
+            const saved = localStorage.getItem('registeredUsers');
+            return saved ? JSON.parse(saved) : [];
+        }
+
+        // ===== LƯU THÔNG TIN VÀO LOCALSTORAGE =====
+        function saveUserToStorage(userData) {
+            let registeredUsers = getRegisteredUsers();
+            
+            // Thêm thời gian đăng ký
+            userData.registeredAt = new Date().toLocaleString('vi-VN');
+            userData.id = Date.now();
+            
+            registeredUsers.push(userData);
+            localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+            
+            return true;
+        }
+
+        // ===== HIỂN THỊ DANH SÁCH NGƯỜI DÙNG =====
+        function showUserList() {
+            const modal = document.getElementById('userListModal');
+            const body = document.getElementById('userListBody');
+            
+            const registeredUsers = getRegisteredUsers();
+            const allUsers = getUsers();
+            
+            let html = '';
+            
+            if (registeredUsers.length === 0) {
+                html = '<p style="text-align: center; padding: 2rem; color: #999;">Chưa có người dùng nào đăng ký mới.</p>';
+            } else {
+                html = `
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Thời gian</th>
+                                <th>Tên đăng nhập</th>
+                                <th>Mật khẩu</th>
+                                <th>Họ tên</th>
+                                <th>Email</th>
+                                <th>Số điện thoại</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                registeredUsers.reverse().forEach((user, index) => {
+                    html += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${user.registeredAt || 'N/A'}</td>
+                            <td><strong>${user.username}</strong></td>
+                            <td><span style="background: #f0f0f0; padding: 0.2rem 0.5rem; border-radius: 3px; font-family: monospace;">${user.password}</span></td>
+                            <td>${user.name}</td>
+                            <td>${user.email}</td>
+                            <td>${user.phone}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+            }
+            
+            body.innerHTML = html;
+            modal.classList.add('show');
+        }
+
+        function closeUserList() {
+            document.getElementById('userListModal').classList.remove('show');
+        }
+
+        // ===== XỬ LÝ FORM ĐĂNG KÝ =====
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Lấy giá trị từ form
+            const username = document.getElementById('username').value.trim();
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const address = document.getElementById('address').value.trim();
+            const terms = document.getElementById('terms').checked;
+            
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Ẩn thông báo cũ
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            
+            // ===== KIỂM TRA TÊN TÀI KHOẢN (USERNAME) =====
+            if (username.length < 6 || username.length > 20) {
+                errorMessage.textContent = 'Tên tài khoản phải từ 6-20 ký tự!';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            const usernameRegex = /^[a-zA-Z0-9_]+$/;
+            if (!usernameRegex.test(username)) {
+                errorMessage.textContent = 'Tên tài khoản chỉ được chứa chữ, số và dấu gạch dưới (_)!';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // ===== KIỂM TRA HỌ TÊN =====
+            if (!firstName || !lastName) {
+                errorMessage.textContent = 'Vui lòng nhập đầy đủ họ và tên!';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // ===== KIỂM TRA MẬT KHẨU =====
+            if (password.length < 6) {
+                errorMessage.textContent = 'Mật khẩu phải có ít nhất 6 ký tự!';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                errorMessage.textContent = 'Mật khẩu xác nhận không khớp!';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // ===== KIỂM TRA EMAIL =====
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                errorMessage.textContent = 'Email không hợp lệ!';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // ===== KIỂM TRA SỐ ĐIỆN THOẠI =====
+            const phoneRegex = /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/;
+            if (!phoneRegex.test(phone)) {
+                errorMessage.textContent = 'Số điện thoại không hợp lệ!';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // ===== KIỂM TRA ĐIỀU KHOẢN =====
+            if (!terms) {
+                errorMessage.textContent = 'Vui lòng đồng ý với điều khoản!';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // ===== LẤY DANH SÁCH NGƯỜI DÙNG =====
+            let users = getUsers();
+            
+            // ===== KIỂM TRA TÊN TÀI KHOẢN ĐÃ TỒN TẠI CHƯA =====
+            if (users.some(u => u.username === username)) {
+                errorMessage.textContent = 'Tên tài khoản đã được sử dụng!';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // ===== KIỂM TRA EMAIL ĐÃ TỒN TẠI CHƯA =====
+            if (users.some(u => u.email === email)) {
+                errorMessage.textContent = 'Email đã được sử dụng!';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // ===== KIỂM TRA SỐ ĐIỆN THOẠI ĐÃ TỒN TẠI CHƯA =====
+            if (users.some(u => u.phone === phone)) {
+                errorMessage.textContent = 'Số điện thoại đã được sử dụng!';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // ===== TẠO NGƯỜI DÙNG MỚI =====
+            const fullName = firstName + ' ' + lastName;
+            const newUser = {
+                id: Date.now(),
+                username: username,
+                password: password,
+                role: 'user',
+                name: fullName,
+                email: email,
+                phone: phone,
+                address: address || 'Chưa cập nhật',
+                avatar: 'https://i.pravatar.cc/150?u=' + Date.now()
+            };
+            
+            // Thêm vào danh sách users chính
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            // ===== LƯU THÔNG TIN VÀO DANH SÁCH RIÊNG =====
+            const registeredInfo = {
+                username: username,
+                password: password,
+                name: fullName,
+                email: email,
+                phone: phone,
+                address: address || 'Chưa cập nhật'
+            };
+            
+            saveUserToStorage(registeredInfo);
+            
+            // Hiển thị thông báo thành công
+            successMessage.textContent = 'Đăng ký thành công! Thông tin đã được lưu. Đang chuyển đến trang đăng nhập...';
+            successMessage.style.display = 'block';
+            
+            // Reset form
+            document.getElementById('registerForm').reset();
+            
+            // Chuyển đến trang đăng nhập sau 2.5 giây
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2500);
+        });
+        
+        // ===== HIỆN/ẨN MẬT KHẨU =====
+        function togglePassword(fieldId) {
+            const password = document.getElementById(fieldId);
+            const icon = event.currentTarget;
+            
+            if (password.type === 'password') {
+                password.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                password.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Click ra ngoài modal để đóng
+        window.onclick = function(event) {
+            const modal = document.getElementById('userListModal');
+            if (event.target === modal) {
+                modal.classList.remove('show');
+            }
+        }
+    </script>
+    <script src="js/utils.js"></script>
+</body>
+</html>

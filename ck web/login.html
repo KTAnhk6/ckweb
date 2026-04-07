@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - SneakerStore</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Tìm đoạn này ở đầu file login.css */
+        .login-container {
+            display: flex;
+            width: 1000px;
+            min-height: 750px; /* Tăng lên 750 để thoải mái không gian */
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            padding-bottom: 30px; /* Thêm khoảng trống dưới đáy */
+        }
+        
+        .login-left {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .login-left h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .login-left p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        .login-left img {
+            width: 80%;
+            max-width: 300px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .login-right {
+            flex: 1;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .login-right h2 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .form-group label i {
+            margin-right: 0.5rem;
+            color: #764ba2;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(118,75,162,0.1);
+        }
+        
+        .password-input {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            cursor: pointer;
+        }
+        
+        .forgot-password {
+            color: #764ba2;
+            text-decoration: none;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+        }
+        
+        .error-message {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            display: none;
+            background: #ffe6e6;
+            padding: 0.8rem;
+            border-radius: 8px;
+        }
+        
+        .demo-accounts {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .demo-accounts h4 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .demo-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            padding: 0.3rem 0;
+        }
+        
+        .demo-role {
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        
+        .demo-role.admin {
+            background: #764ba2;
+            color: white;
+        }
+        
+        .demo-role.user {
+            background: #28a745;
+            color: white;
+        }
+        
+        .register-link {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        
+        .register-link a {
+            color: #764ba2;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* AUTH TABS */
+        .auth-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn.active {
+            color: #764ba2;
+            border-bottom-color: #764ba2;
+        }
+
+        .tab-btn:hover {
+            color: #764ba2;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .success-message {
+            color: #28a745;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            display: none;
+            background: #e8f5e9;
+            padding: 0.8rem;
+            border-radius: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+                width: 90%;
+                height: auto;
+            }
+            
+            .login-left {
+                padding: 2rem;
+            }
+            
+            .login-right {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-left">
+            <h2>SneakerStore</h2>
+            <p>Giày thể thao chính hãng - Đa dạng mẫu mã - Giá tốt nhất</p>
+            <img src="https://images.unsplash.com/photo-1556906781-9a412961c28c?w=500" alt="Sneakers">
+        </div>
+        
+        <div class="login-right">
+            <!-- TAB TOGGLE -->
+            <div class="auth-tabs">
+                <button class="tab-btn active" onclick="switchTab('login')">
+                    <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                </button>
+                <button class="tab-btn" onclick="switchTab('register')">
+                    <i class="fas fa-user-plus"></i> Đăng ký
+                </button>
+            </div>
+            
+            <!-- FORM ĐĂNG NHẬP -->
+            <div id="login-form" class="auth-form active">
+                <h2>Đăng nhập</h2>
+                
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-user"></i>
+                            Tên đăng nhập
+                        </label>
+                        <input type="text" id="username" placeholder="Nhập tên đăng nhập" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-lock"></i>
+                            Mật khẩu
+                        </label>
+                        <div class="password-input">
+                            <input type="password" id="password" placeholder="Nhập mật khẩu" required>
+                            <i class="fas fa-eye toggle-password" onclick="togglePassword('password')"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" id="remember"> Ghi nhớ đăng nhập
+                        </label>
+                        <a href="#" class="forgot-password">Quên mật khẩu?</a>
+                    </div>
+                    
+                    <div class="error-message" id="errorMessage"></div>
+                    
+                    <button type="submit" class="login-btn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Đăng nhập
+                    </button>
+                </form>
+            </div>
+            
+            <!-- FORM ĐĂNG KÝ -->
+            <div id="register-form" class="auth-form">
+                <h2>Đăng ký</h2>
+                
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-user"></i>
+                            Họ và tên
+                        </label>
+                        <input type="text" id="fullname" placeholder="Nhập họ và tên" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-envelope"></i>
+                            Email
+                        </label>
+                        <input type="email" id="email" placeholder="Nhập email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-user-circle"></i>
+                            Tên đăng nhập
+                        </label>
+                        <input type="text" id="newUsername" placeholder="Nhập tên đăng nhập" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-lock"></i>
+                            Mật khẩu
+                        </label>
+                        <div class="password-input">
+                            <input type="password" id="newPassword" placeholder="Nhập mật khẩu" required>
+                            <i class="fas fa-eye toggle-password" onclick="togglePassword('newPassword')"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-key"></i>
+                            Xác nhận mật khẩu
+                        </label>
+                        <div class="password-input">
+                            <input type="password" id="confirmPassword" placeholder="Xác nhận mật khẩu" required>
+                            <i class="fas fa-eye toggle-password" onclick="togglePassword('confirmPassword')"></i>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin: 15px 0 20px 5px;">
+    <input type="checkbox" id="agree-terms" style="width: 18px; height: 18px; cursor: pointer;" required>
+    <label for="agree-terms" style="font-size: 14px; color: #555; cursor: pointer;">Tôi đồng ý với điều khoản đăng ký</label>
+</div>
+                    <button type="submit" class="login-btn">
+                        <i class="fas fa-user-plus"></i>
+                        Đăng ký
+                    </button>
+
+<div style="text-align: center; margin-top: 15px; font-size: 14px;">
+    <p>Đã có tài khoản? <a href="#" style="color: #6a11cb; text-decoration: none; font-weight: bold;">Đăng nhập ngay</a></p>
+</div>
+                    
+                    <div class="error-message" id="registerErrorMessage"></div>
+                    <div class="success-message" id="registerSuccessMessage"></div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ===== CHUYỂN ĐỔI GIỮA TAB ĐĂNG NHẬP VÀ ĐĂNG KÝ =====
+        function switchTab(tab) {
+            // Ẩn tất cả forms
+            document.getElementById('login-form').classList.remove('active');
+            document.getElementById('register-form').classList.remove('active');
+            
+            // Xóa active class từ tất cả buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Hiển thị form được chọn
+            if (tab === 'login') {
+                document.getElementById('login-form').classList.add('active');
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            } else if (tab === 'register') {
+                document.getElementById('register-form').classList.add('active');
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            }
+        }
+
+        // ===== HÀM LẤY DANH SÁCH NGƯỜI DÙNG TỪ LOCALSTORAGE =====
+        function getUsers() {
+            // Thử lấy từ localStorage trước
+            const storedUsers = localStorage.getItem('users');
+            
+            if (storedUsers) {
+                return JSON.parse(storedUsers);
+            } else {
+                // Nếu chưa có, tạo users mặc định
+                const defaultUsers = [
+                    { id: 1, username: 'admin', password: 'admin123', role: 'admin', name: 'Admin', email: 'admin@sneakerstore.com', phone: '0901234567', address: 'Hà Nội', avatar: 'https://i.pravatar.cc/150?u=1' },
+                    { id: 2, username: 'user1', password: 'user123', role: 'user', name: 'Nguyễn Văn A', email: 'nguyenvana@email.com', phone: '0912345678', address: 'Hà Nội', avatar: 'https://i.pravatar.cc/150?u=2' },
+                    { id: 3, username: 'user2', password: 'user123', role: 'user', name: 'Trần Thị B', email: 'tranthib@email.com', phone: '0923456789', address: 'Đà Nẵng', avatar: 'https://i.pravatar.cc/150?u=3' }
+                ];
+                
+                // Lưu vào localStorage để dùng sau
+                localStorage.setItem('users', JSON.stringify(defaultUsers));
+                return defaultUsers;
+            }
+        }
+
+        // ===== XỬ LÝ FORM ĐĂNG NHẬP =====
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+            const errorMessage = document.getElementById('errorMessage');
+
+            // Lấy danh sách users từ localStorage
+            const users = getUsers();
+
+            // Tìm user
+            const user = users.find(u => u.username === username && u.password === password);
+
+            if (user) {
+                // Xóa mật khẩu trước khi lưu vào session
+                const { password, ...userWithoutPassword } = user;
+                
+                // Lưu vào session (hiện tại)
+                sessionStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
+                
+                // Lưu remember nếu được chọn
+                if (remember) {
+                    localStorage.setItem('rememberedUser', JSON.stringify(userWithoutPassword));
+                }
+                
+                // Chuyển hướng dựa vào role
+                if (user.role === 'admin') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            } else {
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Tên đăng nhập hoặc mật khẩu không đúng!';
+            }
+        });
+
+        // ===== XỬ LÝ FORM ĐĂNG KÝ =====
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const fullname = document.getElementById('fullname').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const newUsername = document.getElementById('newUsername').value.trim();
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const errorMessage = document.getElementById('registerErrorMessage');
+            const successMessage = document.getElementById('registerSuccessMessage');
+
+            // Xóa thông báo cũ
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+
+            // Validate
+            if (!fullname || !email || !newUsername || !newPassword) {
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Vui lòng điền đầy đủ tất cả các trường!';
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Mật khẩu xác nhận không khớp!';
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Mật khẩu phải có ít nhất 6 ký tự!';
+                return;
+            }
+
+            // Lấy danh sách users
+            const users = getUsers();
+
+            // Kiểm tra username đã tồn tại chưa
+            if (users.find(u => u.username === newUsername)) {
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Tên đăng nhập này đã được sử dụng!';
+                return;
+            }
+
+            // Kiểm tra email đã tồn tại chưa
+            if (users.find(u => u.email === email)) {
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Email này đã được đăng ký!';
+                return;
+            }
+
+            // Tạo user mới
+            const newUser = {
+                id: users.length + 1,
+                username: newUsername,
+                password: newPassword,
+                role: 'user',
+                name: fullname,
+                email: email,
+                phone: '',
+                address: '',
+                avatar: `https://i.pravatar.cc/150?u=${newUsername}`
+            };
+
+            // Thêm vào danh sách và lưu
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+
+            // Hiển thị thông báo thành công
+            successMessage.style.display = 'block';
+            successMessage.textContent = 'Đăng ký thành công! Vui lòng đăng nhập.';
+
+            // Reset form
+            document.getElementById('registerForm').reset();
+
+            // Chuyển sang tab đăng nhập sau 2 giây
+            setTimeout(() => {
+                switchTab('login');
+            }, 2000);
+        });
+
+        // ===== HIỆN/ẨN MẬT KHẨU =====
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.nextElementSibling;
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // ===== KIỂM TRA XEM CÓ REMEMBERED USER KHÔNG =====
+        window.addEventListener('load', function() {
+            const remembered = localStorage.getItem('rememberedUser');
+            if (remembered) {
+                // Có thể tự động điền tên đăng nhập nếu muốn
+                const user = JSON.parse(remembered);
+                document.getElementById('username').value = user.username;
+                document.getElementById('remember').checked = true;
+            }
+        });
+    </script>
+    <script src="js/utils.js"></script>
+</body>
+</html>

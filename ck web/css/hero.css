@@ -1,0 +1,31 @@
+/* hero.css */
+.hero {
+    margin-top: 80px;
+    height: 500px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: white;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    
+    /* Gọi hiệu ứng animation */
+    animation: slideChange 15s infinite; 
+    transition: background-image 1s ease-in-out;
+}
+
+@keyframes slideChange {
+    0%, 30% {
+        background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                          url('https://images.unsplash.com/photo-1556906781-9a412961c28c?q=80&w=1950');
+    }
+    33%, 63% {
+        background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                          url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1950');
+    }
+    66%, 100% {
+        background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                          url('https://images.unsplash.com/photo-1472851294608-062f824d29cc?q=80&w=1950');
+    }
+}
